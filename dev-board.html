@@ -629,9 +629,51 @@
   <div id="toast" class="toast">Pedido copiado com sucesso!</div>
 
   <script>
-    const STORAGE_KEY = 'cards_dungeons_kanban_tasks_v3';
+    const STORAGE_KEY = 'cards_dungeons_kanban_tasks_v4';
 
     const DEFAULT_TASKS = [
+      // SISTEMA DE COMBATE MULTI-INIMIGOS & BALANCEAMENTO
+      {
+        id: 'task-enemy-multi',
+        title: 'Refatoração da Engine para Batalhas com Múltiplos Inimigos & Minions (1vN)',
+        desc: 'Modificar CombatSystem.js para suportar uma lista de inimigos ativos (enemies = []) em vez de um único alvo. Implementar ciclo de turnos sequencial para cada monstro vivo, cálculo coletivo de vitória ao abater todos os inimigos, e sistema de invocação de lacaios/minions dinâmicos durante o combate.',
+        priority: 'high',
+        category: 'Mecânica',
+        column: 'todo-high'
+      },
+      {
+        id: 'task-enemy-target',
+        title: 'Sistema de Seleção Tática de Alvo (Targeting & Mira de Cartas)',
+        desc: 'Implementar mecânica de seleção do inimigo alvo através de clique, toque ou direcional (com highlight visual e retículo de mira). Adaptar a execução de cartas para distinguir: cartas de Alvo Único (atinge o selecionado, com mira automática no primeiro vivo por padrão), cartas em Área / AoE (atingem todos os inimigos da arena) e cartas com Alvo Aleatório.',
+        priority: 'high',
+        category: 'Interface',
+        column: 'todo-high'
+      },
+      {
+        id: 'task-enemy-rebalance',
+        title: 'Rebalanceamento de Dificuldade & IA Tática Complexa para Inimigos Normais',
+        desc: 'Reajustar atributos e implementar comportamentos desafiadores para os inimigos normais dos primeiros andares (combater a facilidade apontada no playtest). Adicionar aplicação de debuffs no jogador (Vulnerável, Fraco, Sangramento), posturas reativas (defesa quando o HP estiver baixo), autoconcessão de Força e ataques combinados.',
+        priority: 'high',
+        category: 'Inimigos',
+        column: 'todo-high'
+      },
+      {
+        id: 'task-enemy-squads',
+        title: 'Novos Encontros em Grupo & Monstros Invocadores de Minions',
+        desc: 'Criar composições de combate em grupo para os nós normais (Ex: Bando com 2x Goblins Ladinos + 1x Goblin Atirador de Pedras; Cultista Sombrio que invoca Ratos da Peste ou Esqueletos Menores caso não seja eliminado rápido; Enxame de Morcegos com roubo de vida).',
+        priority: 'med',
+        category: 'Inimigos',
+        column: 'todo-med'
+      },
+      {
+        id: 'task-enemy-arena-ui',
+        title: 'Layout Responsivo da Arena Multi-Inimigos & HUD de Intenções Individuais',
+        desc: 'Adaptar o layout visual da arena de combate para renderizar de 1 a 3 (ou 4) monstros simultaneamente em telas desktop e mobile. Cada inimigo exibirá sua barra de vida individual, escudo acumulado, ícones de status e intenção de combate telegrafada sobre a cabeça, além de feedback visual de dano/shake focado no inimigo atingido.',
+        priority: 'med',
+        category: 'Design & FX',
+        column: 'todo-med'
+      },
+
       // DESIGN & ANIMAÇÕES (ALTA PRIORIDADE)
       {
         id: 'task-fx-1',
@@ -824,7 +866,7 @@
     let categoryFilter = 'all';
 
     function initBoard() {
-      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('cards_dungeons_kanban_tasks_v2') || localStorage.getItem('cards_dungeons_kanban_tasks_v1');
+      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('cards_dungeons_kanban_tasks_v3') || localStorage.getItem('cards_dungeons_kanban_tasks_v2') || localStorage.getItem('cards_dungeons_kanban_tasks_v1');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);

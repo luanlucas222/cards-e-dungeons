@@ -75,6 +75,7 @@ export class ViewManager {
 
     // Aplica cenários de alta definição nas telas principais
     this.applyScreenBackgrounds();
+    this.updateMenuSoulsBadge();
   }
 
   _bindGlobalEvents() {
@@ -1499,7 +1500,7 @@ export class ViewManager {
     const meta = getMetaProgression();
     const countEl = document.getElementById('menu-souls-count');
     if (countEl) {
-      countEl.textContent = `${meta.souls} Almas`;
+      countEl.textContent = `${meta.souls} 🔮`;
     }
   }
 

@@ -8,20 +8,20 @@
 export const TALENT_STORAGE_KEY = 'cards_dungeons_meta_progression_v1';
 
 // Armazenamento em memória seguro para fallback em Node.js e testes
-const _memoryStorage = new Map();
+const _talentMemoryStorage = new Map();
 
-function _getStorageItem(key) {
+function _getTalentStorageItem(key) {
   if (typeof localStorage !== 'undefined') {
     return localStorage.getItem(key);
   }
-  return _memoryStorage.get(key) || null;
+  return _talentMemoryStorage.get(key) || null;
 }
 
-function _setStorageItem(key, value) {
+function _setTalentStorageItem(key, value) {
   if (typeof localStorage !== 'undefined') {
     localStorage.setItem(key, value);
   }
-  _memoryStorage.set(key, value);
+  _talentMemoryStorage.set(key, value);
 }
 
 /**
@@ -79,7 +79,7 @@ export const TALENT_DEFINITIONS = {
  * @returns {{ souls: number, totalSoulsEarned: number, talents: Object }}
  */
 export function getMetaProgression() {
-  const raw = _getStorageItem(TALENT_STORAGE_KEY);
+  const raw = _getTalentStorageItem(TALENT_STORAGE_KEY);
   if (raw) {
     try {
       const parsed = JSON.parse(raw);
@@ -116,7 +116,7 @@ export function getMetaProgression() {
  * @param {Object} meta
  */
 export function saveMetaProgression(meta) {
-  _setStorageItem(TALENT_STORAGE_KEY, JSON.stringify(meta));
+  _setTalentStorageItem(TALENT_STORAGE_KEY, JSON.stringify(meta));
 }
 
 /**
