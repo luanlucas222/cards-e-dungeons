@@ -3,7 +3,7 @@
    Modais de Deck, Santuário / Fogueira, Recompensa, Vitória & Game Over
    ========================================================================== */
 
-/* Fundo Escuro / Overlay Geral */
+/* Fundo Escuro / Overlay Geral (Otimizado sem lag no mobile) */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -11,17 +11,25 @@
   width: 100dvw;
   height: 100vh;
   height: 100dvh;
-  background: rgba(5, 6, 9, 0.88);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(5, 6, 9, 0.93);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease;
-  padding: clamp(8px, 2vw, 20px);
+  transition: opacity 0.2s ease;
+  padding: clamp(4px, 1.5vw, 16px);
+  will-change: opacity;
+  transform: translateZ(0);
+}
+
+@media (min-width: 900px) and (min-height: 600px) {
+  .modal-backdrop {
+    background: rgba(5, 6, 9, 0.88);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
 }
 
 .modal-backdrop.active {
@@ -1485,4 +1493,49 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   OTIMIZAÇÃO MOBILE LANDSCAPE MODAIS (ALTURA <= 460px)
+   ========================================================================== */
+@media (max-height: 460px) and (orientation: landscape) {
+  .modal-window {
+    max-height: 96vh;
+    max-height: 96dvh;
+    border-radius: 8px;
+    max-width: min(96vw, 780px);
+  }
+  .modal-header {
+    padding: 6px 14px;
+    min-height: 36px;
+  }
+  .modal-header h2,
+  .modal-header h3 {
+    font-size: 0.92rem;
+  }
+  .modal-close-btn {
+    top: 6px;
+    right: 10px;
+    width: 26px;
+    height: 26px;
+  }
+  .modal-content {
+    padding: 6px 12px;
+    max-height: calc(96vh - 82px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .modal-footer {
+    padding: 6px 14px;
+    min-height: 40px;
+  }
+  .reward-cards-container {
+    gap: 10px;
+    padding: 6px 0;
+  }
+  .merchant-grid {
+    gap: 8px;
+    padding: 6px;
+  }
+}
+
 

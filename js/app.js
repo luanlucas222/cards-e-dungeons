@@ -756,4 +756,13 @@ if (typeof window !== 'undefined') {
     const btnInstall = document.getElementById('btn-pwa-install');
     if (btnInstall) btnInstall.style.display = 'none';
   });
+
+  // Otimização de Performance e Bateria Mobile (Page Visibility API)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      if (window.SoundFX && typeof window.SoundFX.stopDungeonMusic === 'function') {
+        window.SoundFX.stopDungeonMusic();
+      }
+    }
+  });
 }

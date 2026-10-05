@@ -4,7 +4,7 @@
    Texturas Procedurais, Iluminação de Tocha e Proporções de RPG
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Cinzel+Decorative:wght@700;900&family=Inter:wght@400;500;600;700;800&display=swap');
+/* Fontes pré-carregadas via index.html com fallbacks locais */
 
 :root {
   /* Paleta Base - Ardósia e Sombras de Masmorra */
@@ -66,6 +66,13 @@
   --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.7);
   --shadow-card-hover: 0 18px 40px rgba(0, 0, 0, 0.9), 0 0 24px var(--gold-glow);
   --transition-smooth: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (max-height: 480px) and (orientation: landscape) {
+  :root {
+    --card-w: clamp(86px, 11vw, 110px);
+    --card-h: clamp(122px, 34vh, 150px);
+  }
 }
 
 /* Reset Global */

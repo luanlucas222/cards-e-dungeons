@@ -9655,10 +9655,22 @@ class CombatFx {
     if (!this.canvas || !this.stage) return;
     const rect = this.stage.getBoundingClientRect();
     if (rect.width > 0 && rect.height > 0) {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2.0);
+      this.dpr = dpr;
       this.width = rect.width;
       this.height = rect.height;
-      this.canvas.width = rect.width;
-      this.canvas.height = rect.height;
+      this.canvas.width = Math.round(rect.width * dpr);
+      this.canvas.height = Math.round(rect.height * dpr);
+      this.canvas.style.width = `${rect.width}px`;
+      this.canvas.style.height = `${rect.height}px`;
+      if (this.ctx) {
+        if (typeof this.ctx.resetTransform === 'function') {
+          this.ctx.resetTransform();
+        } else {
+          this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        }
+        this.ctx.scale(dpr, dpr);
+      }
     }
   }
 
@@ -9936,6 +9948,14 @@ class CombatFx {
   }
 
   _update() {
+    // Limita máximo de partículas e efeitos simultâneos para evitar engasgos no mobile
+    if (this.particles.length > 50) {
+      this.particles.splice(0, this.particles.length - 50);
+    }
+    if (this.slashes.length > 8) {
+      this.slashes.splice(0, this.slashes.length - 8);
+    }
+
     // 1. Atualiza cortes
     for (let i = this.slashes.length - 1; i >= 0; i--) {
       const sl = this.slashes[i];
@@ -9992,74 +10012,91 @@ class CombatFx {
     if (!this.ctx) return;
     this.ctx.clearRect(0, 0, this.width, this.height);
 
-    // 1. Renderiza ondas de choque (Shield Wave)
+    // 1. Renderiza ondas de choque (Shield Wave - Zero Blur Dual Stroke)
     this.ctx.save();
     for (const sw of this.shockwaves) {
+      // Halo externo translúcido
+      this.ctx.beginPath();
+      this.ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
+      this.ctx.strokeStyle = `${sw.color}${(sw.life * 0.35).toFixed(3)})`;
+      this.ctx.lineWidth = sw.lineWidth * 2.2 * sw.life;
+      this.ctx.stroke();
+
+      // Anel nítido brilhante
       this.ctx.beginPath();
       this.ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
       this.ctx.strokeStyle = `${sw.color}${sw.life.toFixed(3)})`;
       this.ctx.lineWidth = sw.lineWidth * sw.life;
-      this.ctx.shadowBlur = 12;
-      this.ctx.shadowColor = '#38bdf8';
       this.ctx.stroke();
     }
     this.ctx.restore();
 
-    // 2. Renderiza arcos de corte de lâmina (Slash Arcs)
+    // 2. Renderiza arcos de corte de lâmina (Slash Arcs - Zero Blur Dual Beam)
     this.ctx.save();
     for (const sl of this.slashes) {
       if (sl.progress <= 0) continue;
 
-      this.ctx.beginPath();
-      this.ctx.moveTo(sl.startX, sl.startY);
-
-      // Traçado quadrático parcial baseado no progresso
       const currentEndT = sl.progress;
       const currentCtrlX = sl.startX + (sl.ctrlX - sl.startX) * currentEndT;
       const currentCtrlY = sl.startY + (sl.ctrlY - sl.startY) * currentEndT;
       const currentEndX = sl.startX + (sl.endX - sl.startX) * currentEndT;
       const currentEndY = sl.startY + (sl.endY - sl.startY) * currentEndT;
 
+      // Feixe externo colorido (brilho translúcido largo acelerado por hardware)
+      this.ctx.beginPath();
+      this.ctx.moveTo(sl.startX, sl.startY);
       this.ctx.quadraticCurveTo(currentCtrlX, currentCtrlY, currentEndX, currentEndY);
+      this.ctx.strokeStyle = sl.glow;
+      this.ctx.lineWidth = sl.lineWidth * 1.8 * sl.life;
+      this.ctx.lineCap = 'round';
+      this.ctx.globalAlpha = Math.max(0, sl.life * 0.5);
+      this.ctx.stroke();
 
-      this.ctx.shadowBlur = 18;
-      this.ctx.shadowColor = sl.glow;
+      // Feixe do corpo da lâmina
+      this.ctx.beginPath();
+      this.ctx.moveTo(sl.startX, sl.startY);
+      this.ctx.quadraticCurveTo(currentCtrlX, currentCtrlY, currentEndX, currentEndY);
       this.ctx.strokeStyle = sl.color;
       this.ctx.lineWidth = sl.lineWidth * sl.life;
-      this.ctx.lineCap = 'round';
       this.ctx.globalAlpha = Math.max(0, sl.life);
       this.ctx.stroke();
 
-      // Feixe central hiper-brilhante
+      // Feixe central hiper-brilhante branco
       this.ctx.beginPath();
       this.ctx.moveTo(sl.startX, sl.startY);
       this.ctx.quadraticCurveTo(currentCtrlX, currentCtrlY, currentEndX, currentEndY);
       this.ctx.strokeStyle = '#ffffff';
-      this.ctx.lineWidth = (sl.lineWidth * 0.4) * sl.life;
+      this.ctx.lineWidth = Math.max(1, (sl.lineWidth * 0.45) * sl.life);
+      this.ctx.globalAlpha = Math.max(0, sl.life);
       this.ctx.stroke();
     }
     this.ctx.restore();
 
-    // 3. Renderiza partículas
+    // 3. Renderiza partículas (Chamas, Bolhas, Estrelas e Faíscas)
     this.ctx.save();
     for (const p of this.particles) {
       this.ctx.globalAlpha = Math.max(0, p.life);
 
       if (p.type === 'flame') {
+        // Halo sutil leve
+        this.ctx.beginPath();
+        this.ctx.arc(p.x, p.y, p.size * 1.3, 0, Math.PI * 2);
+        this.ctx.fillStyle = p.color;
+        this.ctx.globalAlpha = Math.max(0, p.life * 0.35);
+        this.ctx.fill();
+
+        // Núcleo da chama
         this.ctx.beginPath();
         this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         this.ctx.fillStyle = p.color;
-        this.ctx.shadowBlur = 10;
-        this.ctx.shadowColor = '#ff6b00';
+        this.ctx.globalAlpha = Math.max(0, p.life);
         this.ctx.fill();
       } else if (p.type === 'bubble') {
         this.ctx.beginPath();
         this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         this.ctx.strokeStyle = p.color;
         this.ctx.lineWidth = 1.5;
-        this.ctx.fillStyle = 'rgba(16, 185, 129, 0.2)';
-        this.ctx.shadowBlur = 8;
-        this.ctx.shadowColor = p.color;
+        this.ctx.fillStyle = 'rgba(16, 185, 129, 0.25)';
         this.ctx.fill();
         this.ctx.stroke();
 
@@ -10078,16 +10115,12 @@ class CombatFx {
         this.ctx.lineTo(p.x, p.y + s);
         this.ctx.moveTo(p.x - s, p.y);
         this.ctx.lineTo(p.x + s, p.y);
-        this.ctx.shadowBlur = 8;
-        this.ctx.shadowColor = p.color;
         this.ctx.stroke();
       } else {
         // Faísca metálica ou fragmento rúnico
         this.ctx.beginPath();
         this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         this.ctx.fillStyle = p.color;
-        this.ctx.shadowBlur = 6;
-        this.ctx.shadowColor = p.color;
         this.ctx.fill();
       }
     }
@@ -14310,6 +14343,15 @@ if (typeof window !== 'undefined') {
     console.log('Cards e Dungeons instalado com sucesso no dispositivo!');
     const btnInstall = document.getElementById('btn-pwa-install');
     if (btnInstall) btnInstall.style.display = 'none';
+  });
+
+  // Otimização de Performance e Bateria Mobile (Page Visibility API)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      if (window.SoundFX && typeof window.SoundFX.stopDungeonMusic === 'function') {
+        window.SoundFX.stopDungeonMusic();
+      }
+    }
   });
 }
 

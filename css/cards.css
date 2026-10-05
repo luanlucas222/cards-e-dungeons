@@ -18,12 +18,13 @@
   padding: 8px;
   box-sizing: border-box;
   transform-origin: center bottom;
-  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), 
-              box-shadow 0.22s ease, 
-              border-color 0.22s ease,
-              filter 0.25s ease;
-  will-change: transform, box-shadow;
+  transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), 
+              opacity 0.18s ease;
+  will-change: transform;
+  transform: translateZ(0);
+  contain: layout paint;
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Moldura Interna de Filigrana Metálica */
@@ -43,9 +44,11 @@
     radial-gradient(circle at 50% 25%, rgba(231, 76, 60, 0.25) 0%, transparent 70%),
     linear-gradient(165deg, #2c1619 0%, #190e10 70%, #0c0708 100%);
 }
-.game-card.card-attack:hover {
-  border-color: var(--crimson-light);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85), 0 0 22px var(--crimson-glow);
+@media (hover: hover) and (pointer: fine) {
+  .game-card.card-attack:hover {
+    border-color: var(--crimson-light);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.85), 0 0 18px var(--crimson-glow);
+  }
 }
 
 /* 2. Defesa (Safira Protetora) */
@@ -55,9 +58,11 @@
     radial-gradient(circle at 50% 25%, rgba(58, 145, 252, 0.25) 0%, transparent 70%),
     linear-gradient(165deg, #162438 0%, #0e1724 70%, #080d14 100%);
 }
-.game-card.card-defense:hover {
-  border-color: var(--sapphire-light);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85), 0 0 22px var(--sapphire-glow);
+@media (hover: hover) and (pointer: fine) {
+  .game-card.card-defense:hover {
+    border-color: var(--sapphire-light);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.85), 0 0 18px var(--sapphire-glow);
+  }
 }
 
 /* 3. Especial / Habilidade (Ouro e Esmeralda Arcano) */
@@ -68,10 +73,18 @@
     radial-gradient(circle at 50% 25%, rgba(212, 175, 55, 0.25) 0%, transparent 70%),
     linear-gradient(165deg, #2e2617 0%, #1c170d 70%, #0e0b06 100%);
 }
-.game-card.card-skill:hover,
-.game-card.card-special:hover {
-  border-color: var(--gold-light);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85), 0 0 24px var(--gold-glow);
+@media (hover: hover) and (pointer: fine) {
+  .game-card.card-skill:hover,
+  .game-card.card-special:hover {
+    border-color: var(--gold-light);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.85), 0 0 20px var(--gold-glow);
+  }
+}
+
+/* Feedback Tátil Imediato para Toque no Celular */
+.game-card:active {
+  transform: translateY(-8px) scale(1.04) translateZ(0);
+  filter: brightness(1.1);
 }
 
 /* ==========================================================================
@@ -425,3 +438,51 @@
   50% { transform: scale(1.05); filter: brightness(1.6) drop-shadow(0 0 16px #fae48c); }
   100% { transform: scale(1); filter: none; }
 }
+
+/* ==========================================================================
+   OTIMIZAÇÃO MOBILE LANDSCAPE (TELAS DEITADAS <= 460px de altura)
+   ========================================================================== */
+@media (max-height: 460px) and (orientation: landscape) {
+  .game-card {
+    padding: 4px;
+    border-radius: 7px;
+  }
+  .card-header {
+    height: 18px;
+    margin-bottom: 2px;
+    padding-left: 14px;
+  }
+  .card-title {
+    font-size: 0.64rem;
+  }
+  .card-art-frame {
+    min-height: 36px;
+    max-height: 48px;
+    border-radius: 4px;
+  }
+  .card-art-frame img,
+  .card-art-frame svg {
+    max-height: 38px;
+  }
+  .card-cost {
+    width: 22px;
+    height: 22px;
+    font-size: 0.78rem;
+    top: -4px;
+    left: -4px;
+  }
+  .card-body {
+    padding: 2px 2px 0;
+    gap: 2px;
+  }
+  .card-description {
+    font-size: 0.62rem;
+    line-height: 1.15;
+    padding: 1px 2px;
+  }
+  .card-type-badge {
+    font-size: 0.54rem;
+    padding: 1px 4px;
+  }
+}
+
