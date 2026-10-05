@@ -312,6 +312,12 @@
       color: var(--text-muted);
     }
 
+    .tag-category-design {
+      background: rgba(168, 85, 247, 0.18);
+      border: 1px solid rgba(168, 85, 247, 0.45);
+      color: #d8b4fe;
+    }
+
     .card-title {
       font-size: 0.86rem;
       font-weight: 700;
@@ -512,6 +518,7 @@
     <div class="filter-group">
       <span class="filter-label">Área:</span>
       <button class="filter-pill active" onclick="setCategoryFilter('all')">Tudo</button>
+      <button class="filter-pill" onclick="setCategoryFilter('Design & FX')">🎨 Design & FX</button>
       <button class="filter-pill" onclick="setCategoryFilter('Mecânica')">Mecânica</button>
       <button class="filter-pill" onclick="setCategoryFilter('Cartas')">Cartas</button>
       <button class="filter-pill" onclick="setCategoryFilter('Inimigos')">Inimigos</button>
@@ -594,6 +601,7 @@
       <div class="form-group">
         <label>Categoria / Área</label>
         <select id="new-category" class="form-control">
+          <option value="Design & FX">🎨 Design & FX (Animações)</option>
           <option value="Mecânica">Mecânica de Jogo</option>
           <option value="Cartas">Cartas & Decks</option>
           <option value="Inimigos">Inimigos & Chefes</option>
@@ -621,9 +629,27 @@
   <div id="toast" class="toast">Pedido copiado com sucesso!</div>
 
   <script>
-    const STORAGE_KEY = 'cards_dungeons_kanban_tasks_v1';
+    const STORAGE_KEY = 'cards_dungeons_kanban_tasks_v2';
 
     const DEFAULT_TASKS = [
+      // DESIGN & ANIMAÇÕES (ALTA PRIORIDADE)
+      {
+        id: 'task-fx-1',
+        title: 'Sistema de Impacto Físico & Screen Feel no Combate (Juice & Shake)',
+        desc: 'Adicionar camera shake dinâmico em acertos críticos ou golpes pesados, flash de impacto branco/vermelho nos sprites de monstros, recoil físico com squash & stretch ao sofrer dano, e números flutuantes de combate (Floating Combat Text) animados com física e cores temáticas (vermelho: corte, roxo: veneno, laranja: queimadura, azul: escudo).',
+        priority: 'high',
+        category: 'Design & FX',
+        column: 'todo-high'
+      },
+      {
+        id: 'task-fx-2',
+        title: 'Física 3D Tátil & Animações de Lançamento de Cartas (3D Tilt & Play FX)',
+        desc: 'Efeito de inclinação e perspectiva 3D nas cartas seguindo a posição do ponteiro ou toque com reflexo de luz especular. Animação suave ao puxar cartas (Deal animation distribuindo do baralho para a mão) e efeito dramático ao jogar a carta (ela voa ao centro da arena e dissolve em um clarão de partículas mágicas).',
+        priority: 'high',
+        category: 'Design & FX',
+        column: 'todo-high'
+      },
+
       // PRIORIDADE ALTA
       {
         id: 'task-1',
@@ -656,6 +682,32 @@
         priority: 'high',
         category: 'Inimigos',
         column: 'todo-high'
+      },
+
+      // DESIGN & ANIMAÇÕES (MÉDIA PRIORIDADE)
+      {
+        id: 'task-fx-3',
+        title: 'Atmosfera Viva de Calabouço & Iluminação Dinâmica de Tochas',
+        desc: 'Iluminação ambiente dinâmica com tochas bruxuleantes nas paredes do calabouço projetando sombras pulsantes, partículas de brasas incandescentes subindo na tela, camada suave de névoa rastejante no chão da arena e banner cinematográfico animado ao alternar turnos ("SEU TURNO" / "TURNO DO INIMIGO").',
+        priority: 'med',
+        category: 'Design & FX',
+        column: 'todo-med'
+      },
+      {
+        id: 'task-fx-4',
+        title: 'Overhaul de UI Dark Fantasy & Orbes de Mana Líquidos',
+        desc: 'Redesenho visual completo dos painéis de combate com molduras góticas ornamentadas, orbe de mana com efeito de líquido ondulante e bolhas arcanas, e barras de vida com animação de sangramento (dano recente fica marcado em vermelho claro e drena suavemente).',
+        priority: 'med',
+        category: 'Design & FX',
+        column: 'todo-med'
+      },
+      {
+        id: 'task-fx-5',
+        title: 'Animação Triunfal de Vitória & Baú de Recompensas 3D',
+        desc: 'Tela de vitória após os combates com baú do tesouro épico se abrindo, projetando feixes dourados de luz volumétrica, chuva de moedas tilintando com física e cartas de recompensa saltando do interior do baú com partículas cintilantes de acordo com a raridade.',
+        priority: 'med',
+        category: 'Design & FX',
+        column: 'todo-med'
       },
 
       // PRIORIDADE MÉDIA
@@ -772,17 +824,20 @@
     let categoryFilter = 'all';
 
     function initBoard() {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('cards_dungeons_kanban_tasks_v1');
       if (saved) {
         try {
-          tasks = JSON.parse(saved);
+          const parsed = JSON.parse(saved);
+          const existingIds = new Set(parsed.map(t => t.id));
+          const missingDefaults = DEFAULT_TASKS.filter(t => !existingIds.has(t.id));
+          tasks = [...parsed, ...missingDefaults];
         } catch (e) {
           tasks = [...DEFAULT_TASKS];
         }
       } else {
         tasks = [...DEFAULT_TASKS];
-        saveTasks();
       }
+      saveTasks();
       renderBoard();
     }
 
@@ -818,7 +873,7 @@
           <div class="card-top">
             <div class="card-tags">
               <span class="tag tag-priority-${task.priority}">● ${priorityLabel}</span>
-              <span class="tag tag-category">${task.category || 'Geral'}</span>
+              <span class="${task.category === 'Design & FX' ? 'tag tag-category tag-category-design' : 'tag tag-category'}">${task.category || 'Geral'}</span>
             </div>
             <div class="card-actions-dropdown">
               <button class="btn-icon" onclick="moveTask('${task.id}', -1)" title="Mover para esquerda">◀</button>
