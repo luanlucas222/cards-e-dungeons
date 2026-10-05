@@ -75,6 +75,7 @@ server.listen(4123, '127.0.0.1', async () => {
     '/js/data/merchant.js',
     '/js/data/potions.js',
     '/js/data/narrativeEvents.js',
+    '/js/data/talents.js',
     '/js/ui/CardRenderer.js',
     '/js/ui/CombatRenderer.js',
     '/js/ui/MapRenderer.js',

@@ -1538,4 +1538,190 @@
   }
 }
 
+/* ==========================================================================
+   SANTUÁRIO DE TALENTOS & META-PROGRESSÃO PERMANENTE
+   ========================================================================== */
+.modal-talents-window {
+  background: radial-gradient(circle at 50% 10%, #1e1136 0%, #0d0a17 80%);
+  border: 1.5px solid #a855f7;
+  box-shadow: 0 0 35px rgba(168, 85, 247, 0.35), 0 20px 50px rgba(0, 0, 0, 0.95);
+  max-width: 680px;
+  width: 95%;
+}
+
+.talents-souls-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(168, 85, 247, 0.2);
+  border: 1px solid rgba(192, 132, 252, 0.6);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #e9d5ff;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
+}
+
+.talents-modal-body {
+  padding: 16px 20px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.talents-lore-subtitle {
+  font-size: 0.82rem;
+  color: #c4b5fd;
+  line-height: 1.45;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.talents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.talent-card {
+  background: rgba(22, 18, 38, 0.9);
+  border: 1.5px solid #3b2859;
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
+
+.talent-card:hover {
+  border-color: #a855f7;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(168, 85, 247, 0.2);
+}
+
+.talent-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.talent-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.talent-icon {
+  font-size: 1.5rem;
+}
+
+.talent-name {
+  font-family: var(--font-fantasy);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #fae48c;
+}
+
+.talent-level-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #c084fc;
+  background: rgba(168, 85, 247, 0.15);
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.talent-pips-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 4px 0;
+}
+
+.talent-pip {
+  width: 14px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+}
+
+.talent-pip.active {
+  background: #a855f7;
+  border-color: #c084fc;
+  box-shadow: 0 0 6px #c084fc;
+}
+
+.talent-desc {
+  font-size: 0.76rem;
+  color: #d1d5db;
+  line-height: 1.4;
+}
+
+.talent-bonus-preview {
+  font-size: 0.74rem;
+  color: #86efac;
+  font-weight: 600;
+  background: rgba(34, 197, 94, 0.08);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border-left: 2px solid #22c55e;
+}
+
+.talent-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.btn-talent-upgrade {
+  background: linear-gradient(135deg, #7e22ce, #581c87);
+  border: 1px solid #c084fc;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.78rem;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-talent-upgrade:hover:not(:disabled) {
+  background: linear-gradient(135deg, #9333ea, #6b21a8);
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.5);
+  transform: scale(1.02);
+}
+
+.btn-talent-upgrade:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #4b5563;
+  background: #1f2937;
+}
+
+.btn-talent-max {
+  background: rgba(212, 175, 55, 0.15) !important;
+  border-color: #d4af37 !important;
+  color: #fae48c !important;
+  cursor: default !important;
+}
+
+.talents-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-top: 1px solid #3b2859;
+}
+
 

@@ -6706,6 +6706,259 @@ if (typeof window !== 'undefined') {
 }
 
 
+/* --- MÓDULO: js/data/talents.js --- */
+/**
+ * js/data/talents.js
+ * Sistema de Meta-Progressão Permanente & Árvore de Talentos Ancestrais.
+ * Permite coletar Essências de Almas ao derrotar inimigos e chefes para
+ * desbloquear bônus passivos permanentes que perduram entre partidas.
+ */
+
+const TALENT_STORAGE_KEY = 'cards_dungeons_meta_progression_v1';
+
+// Armazenamento em memória seguro para fallback em Node.js e testes
+const _memoryStorage = new Map();
+
+function _getStorageItem(key) {
+  if (typeof localStorage !== 'undefined') {
+    return localStorage.getItem(key);
+  }
+  return _memoryStorage.get(key) || null;
+}
+
+function _setStorageItem(key, value) {
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem(key, value);
+  }
+  _memoryStorage.set(key, value);
+}
+
+/**
+ * Definições dos Talentos da Árvore de Meta-Progressão
+ */
+const TALENT_DEFINITIONS = {
+  vitality: {
+    id: 'vitality',
+    name: 'Vitalidade Ancestral',
+    icon: '❤️',
+    maxLevel: 5,
+    costs: [10, 20, 35, 55, 80],
+    bonusPerLevel: 5,
+    unit: 'HP',
+    description: 'Aumenta sua Vida Máxima inicial em +5 por nível permanente.',
+    getBonusText: (lvl) => `+${lvl * 5} Vida Máxima inicial`
+  },
+  greed: {
+    id: 'greed',
+    name: 'Avareza dos Abismos',
+    icon: '🪙',
+    maxLevel: 5,
+    costs: [10, 20, 35, 50, 70],
+    bonusPerLevel: 1,
+    unit: 'Ouro',
+    description: 'Ganha +1 de Ouro adicional após cada combate vencido.',
+    getBonusText: (lvl) => `+${lvl * 1} Ouro por vitória em combate`
+  },
+  wisdom: {
+    id: 'wisdom',
+    name: 'Mente Expandida',
+    icon: '🃏',
+    maxLevel: 2,
+    costs: [25, 60],
+    bonusPerLevel: 1,
+    unit: 'Cartas',
+    description: 'Compra +1 carta adicional no primeiro turno de cada combate.',
+    getBonusText: (lvl) => `+${lvl * 1} carta(s) na mão inicial (Turno 1)`
+  },
+  ironclad: {
+    id: 'ironclad',
+    name: 'Bastião de Ferro',
+    icon: '🛡️',
+    maxLevel: 3,
+    costs: [15, 30, 50],
+    bonusPerLevel: 3,
+    unit: 'Armadura',
+    description: 'Inicia cada combate com +3 de Armadura protetora.',
+    getBonusText: (lvl) => `+${lvl * 3} de Armadura inicial no combate`
+  }
+};
+
+/**
+ * Retorna o estado atual da meta-progressão salva.
+ * @returns {{ souls: number, totalSoulsEarned: number, talents: Object }}
+ */
+function getMetaProgression() {
+  const raw = _getStorageItem(TALENT_STORAGE_KEY);
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      return {
+        souls: typeof parsed.souls === 'number' ? parsed.souls : 0,
+        totalSoulsEarned: typeof parsed.totalSoulsEarned === 'number' ? parsed.totalSoulsEarned : (parsed.souls || 0),
+        talents: {
+          vitality: parsed.talents?.vitality || 0,
+          greed: parsed.talents?.greed || 0,
+          wisdom: parsed.talents?.wisdom || 0,
+          ironclad: parsed.talents?.ironclad || 0,
+          ...parsed.talents
+        }
+      };
+    } catch (e) {
+      // JSON corrompido, retorna padrão
+    }
+  }
+
+  return {
+    souls: 0,
+    totalSoulsEarned: 0,
+    talents: {
+      vitality: 0,
+      greed: 0,
+      wisdom: 0,
+      ironclad: 0
+    }
+  };
+}
+
+/**
+ * Salva os dados de meta-progressão no storage.
+ * @param {Object} meta
+ */
+function saveMetaProgression(meta) {
+  _setStorageItem(TALENT_STORAGE_KEY, JSON.stringify(meta));
+}
+
+/**
+ * Adiciona Essências de Almas ganhas nas batalhas ou ao fim de uma jornada.
+ * @param {number} amount
+ * @returns {number} Novo total de almas disponíveis
+ */
+function addSouls(amount) {
+  if (amount <= 0) return getMetaProgression().souls;
+  const meta = getMetaProgression();
+  meta.souls = (meta.souls || 0) + amount;
+  meta.totalSoulsEarned = (meta.totalSoulsEarned || 0) + amount;
+  saveMetaProgression(meta);
+  return meta.souls;
+}
+
+/**
+ * Aprimora um talento em 1 nível gastando Essências de Almas.
+ * @param {string} talentId
+ * @returns {{ success: boolean, message: string, newLevel?: number, remainingSouls?: number }}
+ */
+function upgradeTalent(talentId) {
+  const def = TALENT_DEFINITIONS[talentId];
+  if (!def) {
+    return { success: false, message: `Talento desconhecido: ${talentId}` };
+  }
+
+  const meta = getMetaProgression();
+  const currentLevel = meta.talents[talentId] || 0;
+
+  if (currentLevel >= def.maxLevel) {
+    return { success: false, message: `Talento [${def.name}] já atingiu o nível máximo (${def.maxLevel})!` };
+  }
+
+  const cost = def.costs[currentLevel];
+  if (meta.souls < cost) {
+    return {
+      success: false,
+      message: `Almas insuficientes! Requer 🔮 ${cost} Essências de Almas (você tem 🔮 ${meta.souls}).`
+    };
+  }
+
+  meta.souls -= cost;
+  meta.talents[talentId] = currentLevel + 1;
+  saveMetaProgression(meta);
+
+  return {
+    success: true,
+    message: `Talento [${def.name}] aprimorado para Nível ${meta.talents[talentId]}!`,
+    newLevel: meta.talents[talentId],
+    remainingSouls: meta.souls
+  };
+}
+
+/**
+ * Redefine todos os talentos comprados e reembolsa 100% das Essências de Almas investidas.
+ * @returns {{ refundedSouls: number, totalSouls: number }}
+ */
+function resetTalents() {
+  const meta = getMetaProgression();
+  let refunded = 0;
+
+  for (const [id, def] of Object.entries(TALENT_DEFINITIONS)) {
+    const lvl = meta.talents[id] || 0;
+    for (let i = 0; i < lvl; i++) {
+      refunded += def.costs[i] || 0;
+    }
+    meta.talents[id] = 0;
+  }
+
+  meta.souls = (meta.souls || 0) + refunded;
+  saveMetaProgression(meta);
+
+  return {
+    refundedSouls: refunded,
+    totalSouls: meta.souls
+  };
+}
+
+/**
+ * Calcula todos os bônus numéricos concedidos pelos talentos atuais.
+ * @returns {{ maxHpBonus: number, goldBonus: number, initialCardsBonus: number, startingBlockBonus: number }}
+ */
+function getTalentBonuses() {
+  const meta = getMetaProgression();
+  const talents = meta.talents;
+
+  const vitLvl = talents.vitality || 0;
+  const greedLvl = talents.greed || 0;
+  const wisLvl = talents.wisdom || 0;
+  const ironLvl = talents.ironclad || 0;
+
+  return {
+    maxHpBonus: vitLvl * TALENT_DEFINITIONS.vitality.bonusPerLevel,
+    goldBonus: greedLvl * TALENT_DEFINITIONS.greed.bonusPerLevel,
+    initialCardsBonus: wisLvl * TALENT_DEFINITIONS.wisdom.bonusPerLevel,
+    startingBlockBonus: ironLvl * TALENT_DEFINITIONS.ironclad.bonusPerLevel
+  };
+}
+
+/**
+ * Aplica os bônus da árvore de talentos ao objeto herói no início de uma nova jornada.
+ * @param {Object} hero
+ */
+function applyTalentBonusesToHero(hero) {
+  if (!hero) return;
+  const bonuses = getTalentBonuses();
+
+  // Bônus de Vida Máxima inicial
+  if (bonuses.maxHpBonus > 0) {
+    hero.maxHp = (hero.maxHp || 70) + bonuses.maxHpBonus;
+    hero.hp = hero.maxHp;
+  }
+
+  // Registra bônus passivos para uso no combate
+  hero.talentGoldBonus = bonuses.goldBonus || 0;
+  hero.talentInitialCards = bonuses.initialCardsBonus || 0;
+  hero.talentStartingBlock = bonuses.startingBlockBonus || 0;
+  hero.talentBonuses = bonuses;
+}
+
+/**
+ * Calcula a quantidade de Essências de Almas concedidas pela vitória contra um inimigo.
+ * @param {string} enemyType 'normal' | 'elite' | 'boss'
+ * @returns {number}
+ */
+function calculateSoulsReward(enemyType = 'normal') {
+  if (enemyType === 'boss') return 15;
+  if (enemyType === 'elite') return 5;
+  return 2;
+}
+
+
 /* --- MÓDULO: js/engine/MapGenerator.js --- */
 /**
  * js/engine/MapGenerator.js
@@ -7168,6 +7421,9 @@ class CombatSystem {
    */
   _initCombat() {
     this.hero.block = 0;
+    if (this.hero.talentStartingBlock > 0) {
+      this.hero.block += this.hero.talentStartingBlock;
+    }
     this.hero.energy = this.hero.maxEnergy || 3;
 
     // Inicializa ou preserva mapas de status
@@ -7251,8 +7507,12 @@ class CombatSystem {
       return;
     }
 
-    // Compra 5 cartas
-    this.drawCards(5);
+    // Compra 5 cartas (ou mais se houver bônus de Mente Expandida no Turno 1)
+    const initialBonus = (isFirstTurn && this.hero.talentInitialCards > 0) ? this.hero.talentInitialCards : 0;
+    if (initialBonus > 0) {
+      this._log(`O talento [Mente Expandida] concede +${initialBonus} carta(s) no Turno 1!`);
+    }
+    this.drawCards(5 + initialBonus);
   }
 
   /**
@@ -7884,6 +8144,11 @@ class CombatSystem {
       this.goldReward = 15 + Math.floor(this.rng() * 11);
     }
 
+    if (this.hero.talentGoldBonus > 0) {
+      this.goldReward += this.hero.talentGoldBonus;
+      this._log(`O talento [Avareza dos Abismos] concedeu +${this.hero.talentGoldBonus} de ouro bônus!`);
+    }
+
     this._log(`Vitória gloriosa! Você derrotou ${this.enemy.name}! (+${this.goldReward} ouro)`);
 
     // Dispara gatilho de fim de combate das relíquias (ex: Cálice de Sangue cura 5 HP)
@@ -7988,6 +8253,7 @@ class CombatSystem {
 
 
 
+
 const GAME_SCREENS = {
   TITLE: 'title',
   MAP: 'map',
@@ -8056,6 +8322,8 @@ class GameState {
     this.combatRewardCards = [];
     this.combatRewardPotion = null;
     this.combatRewardGold = 0;
+    this.combatRewardSouls = 0;
+    this.runSoulsEarned = 0;
     this.shrineCardOptions = [];
     this.eliteRewardRelic = null;
     this.runHistory = [];
@@ -8098,6 +8366,9 @@ class GameState {
       addRelicToHero(this.hero, heroClass.startingRelicId);
     }
 
+    // Aplica bônus permanentes da Árvore de Talentos
+    applyTalentBonusesToHero(this.hero);
+
     const mapGen = new MapGenerator({
       act: this.currentAct,
       totalFloors: options.totalFloors || 15,
@@ -8109,6 +8380,8 @@ class GameState {
     this.combatRewardCards = [];
     this.combatRewardPotion = null;
     this.combatRewardGold = 0;
+    this.combatRewardSouls = 0;
+    this.runSoulsEarned = 0;
     this.shrineCardOptions = [];
     this.eliteRewardRelic = null;
     this.merchantInventories = {};
@@ -8233,12 +8506,21 @@ class GameState {
       this.combatRewardGold = this.currentCombat.goldReward || 0;
       this.hero.gold = (this.hero.gold || 0) + this.combatRewardGold;
 
+      // Recompensa de Essências de Almas (Meta-Progressão Permanente)
+      const soulsEarned = calculateSoulsReward(this.currentNode?.type);
+      this.combatRewardSouls = soulsEarned;
+      this.runSoulsEarned = (this.runSoulsEarned || 0) + soulsEarned;
+      addSouls(soulsEarned);
+
       if (this.currentNode && this.currentNode.type === NODE_TYPES.BOSS) {
         if (this.currentAct < this.totalActs) {
           // Conquistou o Chefe do Ato atual (Ato 1 ou 2) -> Transição de Ato com Recuperação de Fôlego!
           this.screen = GAME_SCREENS.ACT_TRANSITION;
         } else {
           // Derrotou o Grande Dragão Tirano no Ato Final (Ato 3) -> Fim de jogo e Vitória Suprema!
+          const victoryBonusSouls = 30;
+          this.runSoulsEarned = (this.runSoulsEarned || 0) + victoryBonusSouls;
+          addSouls(victoryBonusSouls);
           this.screen = GAME_SCREENS.VICTORY;
           this.clearSavedRun();
         }
@@ -11133,6 +11415,7 @@ class CinematicManager {
 
 
 
+
 class ViewManager {
   /**
    * @param {Object} options
@@ -11184,7 +11467,8 @@ class ViewManager {
       event: document.getElementById('modal-event'),
       actTransition: document.getElementById('modal-act-transition'),
       cardSwap: document.getElementById('modal-card-swap'),
-      treasure: document.getElementById('modal-treasure')
+      treasure: document.getElementById('modal-treasure'),
+      talents: document.getElementById('modal-talents')
     };
 
     // Barra de Poções (Fase 3)
@@ -11623,6 +11907,10 @@ class ViewManager {
       } else {
         headerEl.style.display = 'flex';
       }
+    }
+
+    if (screenKey === 'menu') {
+      this.updateMenuSoulsBadge();
     }
 
     if (typeof window !== 'undefined' && window.GamepadManager) {
@@ -12606,6 +12894,163 @@ class ViewManager {
     }
 
     this.openModal(modal);
+  }
+
+  /**
+   * Atualiza o contador de almas no botão do menu principal
+   */
+  updateMenuSoulsBadge() {
+    const meta = getMetaProgression();
+    const countEl = document.getElementById('menu-souls-count');
+    if (countEl) {
+      countEl.textContent = `${meta.souls} Almas`;
+    }
+  }
+
+  /**
+   * Abre o Modal do Santuário de Talentos Ancestrais
+   */
+  openTalentsModal() {
+    const modal = this.modals.talents;
+    if (!modal) return;
+
+    this.renderTalentsModal();
+
+    // Bind botões do modal se ainda não vinculados
+    const btnClose = modal.querySelector('#btn-close-talents');
+    if (btnClose && !btnClose.dataset.bound) {
+      btnClose.dataset.bound = 'true';
+      btnClose.addEventListener('click', () => this.closeModal(modal));
+    }
+
+    const btnCloseHeader = modal.querySelector('#btn-close-talents-header');
+    if (btnCloseHeader && !btnCloseHeader.dataset.bound) {
+      btnCloseHeader.dataset.bound = 'true';
+      btnCloseHeader.addEventListener('click', () => this.closeModal(modal));
+    }
+
+    const btnReset = modal.querySelector('#btn-reset-talents');
+    if (btnReset && !btnReset.dataset.bound) {
+      btnReset.dataset.bound = 'true';
+      btnReset.addEventListener('click', () => this.resetTalentsFromModal());
+    }
+
+    this.openModal(modal);
+  }
+
+  /**
+   * Renderiza a grade de cartas de talentos e saldo de almas no modal
+   */
+  renderTalentsModal() {
+    const modal = this.modals.talents;
+    if (!modal) return;
+
+    const meta = getMetaProgression();
+    const soulsBalanceEl = modal.querySelector('#modal-souls-balance');
+    if (soulsBalanceEl) {
+      soulsBalanceEl.textContent = `${meta.souls} Almas`;
+    }
+    this.updateMenuSoulsBadge();
+
+    const gridEl = modal.querySelector('#talents-grid');
+    if (!gridEl) return;
+    gridEl.innerHTML = '';
+
+    Object.values(TALENT_DEFINITIONS).forEach(def => {
+      const currentLevel = meta.talents[def.id] || 0;
+      const isMax = currentLevel >= def.maxLevel;
+      const nextCost = isMax ? null : def.costs[currentLevel];
+      const canAfford = !isMax && meta.souls >= nextCost;
+
+      const card = document.createElement('div');
+      card.className = 'talent-card';
+
+      // Pips de nível
+      let pipsHtml = '<div class="talent-pips-row">';
+      for (let i = 1; i <= def.maxLevel; i++) {
+        pipsHtml += `<div class="talent-pip ${i <= currentLevel ? 'active' : ''}"></div>`;
+      }
+      pipsHtml += '</div>';
+
+      const currentBonusText = currentLevel > 0
+        ? def.getBonusText(currentLevel)
+        : 'Nenhum bônus ativo';
+
+      const nextPreviewText = isMax
+        ? '✦ Poder Ancestral Pleno Atingido!'
+        : `Próximo nível: ${def.getBonusText(currentLevel + 1)}`;
+
+      card.innerHTML = `
+        <div class="talent-card-header">
+          <div class="talent-title-group">
+            <span class="talent-icon">${def.icon}</span>
+            <div>
+              <div class="talent-name">${def.name}</div>
+              <div class="talent-level-badge">Nv. ${currentLevel} / ${def.maxLevel}</div>
+            </div>
+          </div>
+        </div>
+        ${pipsHtml}
+        <div class="talent-desc">${def.description}</div>
+        <div class="talent-bonus-preview">
+          <div><strong>Atual:</strong> ${currentBonusText}</div>
+          <div style="color: ${isMax ? '#fae48c' : '#c4b5fd'}; margin-top: 2px;">${nextPreviewText}</div>
+        </div>
+        <div class="talent-footer">
+          ${isMax ? `
+            <button class="btn btn-talent-upgrade btn-talent-max" disabled>
+              <span>⭐ NÍVEL MÁXIMO</span>
+            </button>
+          ` : `
+            <button class="btn btn-talent-upgrade btn-upgrade-node" ${canAfford ? '' : 'disabled'}>
+              <span>Aprimorar</span>
+              <span>🔮 ${nextCost}</span>
+            </button>
+          `}
+        </div>
+      `;
+
+      if (!isMax) {
+        const upgradeBtn = card.querySelector('.btn-upgrade-node');
+        if (upgradeBtn) {
+          upgradeBtn.addEventListener('click', () => {
+            const res = upgradeTalent(def.id);
+            if (res.success) {
+              if (typeof window !== 'undefined' && window.SoundFX && window.SoundFX.playBuff) {
+                window.SoundFX.playBuff();
+              }
+              this.showToast(res.message, 'success');
+              this.renderTalentsModal();
+            } else {
+              this.showToast(res.message, 'error');
+            }
+          });
+        }
+      }
+
+      gridEl.appendChild(card);
+    });
+  }
+
+  /**
+   * Reseta todos os talentos e devolve todas as Essências de Almas
+   */
+  resetTalentsFromModal() {
+    const meta = getMetaProgression();
+    const hasAny = Object.values(meta.talents).some(lvl => lvl > 0);
+    if (!hasAny) {
+      this.showToast('Nenhum talento foi adquirido para redefinir.', 'info');
+      return;
+    }
+
+    if (confirm('Deseja redefinir todos os talentos e reembolsar 100% das Essências de Almas investidas?')) {
+      const res = resetTalents();
+      if (typeof window !== 'undefined' && window.SoundFX && window.SoundFX.playCoins) {
+        window.SoundFX.playCoins();
+      }
+      this.showToast(`✨ Talentos redefinidos! +🔮 ${res.refundedSouls} Almas reembolsadas.`, 'success');
+      this.renderTalentsModal();
+    }
   }
 }
 
@@ -13673,6 +14118,14 @@ class GameApp {
       });
     }
 
+    // Botão Árvore de Talentos no Menu
+    const btnTalents = document.getElementById('btn-talents');
+    if (btnTalents) {
+      btnTalents.addEventListener('click', () => {
+        this.viewManager.openTalentsModal();
+      });
+    }
+
     // Botão Como Jogar no Menu
     const btnMenuGuide = document.getElementById('btn-menu-guide');
     if (btnMenuGuide) {
@@ -14096,6 +14549,17 @@ class GameApp {
       goldBox.style.display = 'flex';
     }
 
+    // Recompensa de Almas (Meta-Progressão)
+    const soulsBox = rewardModal.querySelector('#reward-souls-box');
+    const soulsAmountEl = rewardModal.querySelector('#reward-souls-amount');
+    const soulsEarned = this.gameState.combatRewardSouls || 2;
+    if (soulsAmountEl) {
+      soulsAmountEl.textContent = soulsEarned;
+    }
+    if (soulsBox) {
+      soulsBox.style.display = 'flex';
+    }
+
     if (window.SoundFX && typeof window.SoundFX.playCoins === 'function') {
       try {
         window.SoundFX.playCoins();
@@ -14246,16 +14710,18 @@ class GameApp {
     const statsFloor = victoryScreen.querySelector('#stat-victory-floors');
     const statsMonsters = victoryScreen.querySelector('#stat-victory-monsters');
     const statsDeck = victoryScreen.querySelector('#stat-victory-deck');
+    const statsSouls = victoryScreen.querySelector('#stat-victory-souls');
 
     const totalConqueredFloors = 30; // 3 Atos de 10 andares
     if (statsFloor) statsFloor.textContent = `${totalConqueredFloors}`;
     if (statsMonsters) statsMonsters.textContent = `${this.monstersDefeated}`;
     if (statsDeck) statsDeck.textContent = `${this.gameState.hero.deck.length}`;
+    if (statsSouls) statsSouls.textContent = `+${this.gameState.runSoulsEarned || 0}`;
 
     const subtitleEl = victoryScreen.querySelector('.game-over-subtitle');
     const timeFormatted = this.viewManager.formatRunTime(this.gameState.elapsedTime || 0);
     if (subtitleEl) {
-      subtitleEl.innerHTML = `O Grande Dragão Tirano sucumbiu no Ato III! Você conquistou todos os 30 andares do calabouço em <strong>⏱️ ${timeFormatted}</strong> de pura bravura e maestria estratégica.`;
+      subtitleEl.innerHTML = `O Grande Dragão Tirano sucumbiu no Ato III! Você conquistou todos os 30 andares do calabouço em <strong>⏱️ ${timeFormatted}</strong> de pura bravura e maestria estratégica. Suas <strong>+🔮 ${this.gameState.runSoulsEarned || 0} Essências de Almas</strong> foram consagradas!`;
     }
 
     const iconEl = victoryScreen.querySelector('#victory-icon-box');
@@ -14275,16 +14741,18 @@ class GameApp {
     const statsFloor = defeatScreen.querySelector('#stat-defeat-floors');
     const statsMonsters = defeatScreen.querySelector('#stat-defeat-monsters');
     const statsDeck = defeatScreen.querySelector('#stat-defeat-deck');
+    const statsSouls = defeatScreen.querySelector('#stat-defeat-souls');
     const subtitleEl = defeatScreen.querySelector('#defeat-subtitle');
 
     if (statsFloor) statsFloor.textContent = `Ato ${act} (F${currentFloor})`;
     if (statsMonsters) statsMonsters.textContent = `${this.monstersDefeated}`;
     if (statsDeck) statsDeck.textContent = `${this.gameState.hero.deck.length}`;
+    if (statsSouls) statsSouls.textContent = `+${this.gameState.runSoulsEarned || 0}`;
 
     const timeFormatted = this.viewManager.formatRunTime(this.gameState.elapsedTime || 0);
     if (subtitleEl && this.gameState.currentCombat) {
       const killer = this.gameState.currentCombat.enemy.name;
-      subtitleEl.innerHTML = `Você foi superado pelas forças de <strong>${killer}</strong> no Ato ${act} após <strong>⏱️ ${timeFormatted}</strong>. Recupere o ânimo e tente novamente!`;
+      subtitleEl.innerHTML = `Você foi superado pelas forças de <strong>${killer}</strong> no Ato ${act} após <strong>⏱️ ${timeFormatted}</strong>. Suas <strong>+🔮 ${this.gameState.runSoulsEarned || 0} Essências de Almas</strong> foram resgatadas para a Árvore de Talentos!`;
     }
 
     const iconEl = defeatScreen.querySelector('#defeat-icon-box');

@@ -629,7 +629,7 @@
   <div id="toast" class="toast">Pedido copiado com sucesso!</div>
 
   <script>
-    const STORAGE_KEY = 'cards_dungeons_kanban_tasks_v2';
+    const STORAGE_KEY = 'cards_dungeons_kanban_tasks_v3';
 
     const DEFAULT_TASKS = [
       // DESIGN & ANIMAÇÕES (ALTA PRIORIDADE)
@@ -651,14 +651,6 @@
       },
 
       // PRIORIDADE ALTA
-      {
-        id: 'task-1',
-        title: 'Árvore de Talentos & Meta-Progressão Permanente',
-        desc: 'Permitir gastar Essências de Almas ganhas nas partidas para desbloquear bônus passivos permanentes (Vida inicial +5, +1 de Ouro por vitória, +1 de Carta inicial).',
-        priority: 'high',
-        category: 'Mecânica',
-        column: 'todo-high'
-      },
       {
         id: 'task-2',
         title: 'Modo Desafio Diário (Daily Run)',
@@ -746,6 +738,14 @@
 
       // CONCLUÍDOS (HISTÓRICO)
       {
+        id: 'task-1',
+        title: 'Árvore de Talentos & Meta-Progressão Permanente',
+        desc: 'Permitir gastar Essências de Almas ganhas nas partidas para desbloquear bônus passivos permanentes (Vida inicial +5, +1 de Ouro por vitória, +1 de Carta inicial).',
+        priority: 'high',
+        category: 'Mecânica',
+        column: 'done'
+      },
+      {
         id: 'task-c1',
         title: 'Otimização Mobile Geral para 60 FPS no Android',
         desc: 'Eliminação do shadowBlur pesado no Canvas de combate, ajuste de altura em paisagem (max-height <= 460px) e fim do hover preso no toque.',
@@ -824,10 +824,13 @@
     let categoryFilter = 'all';
 
     function initBoard() {
-      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('cards_dungeons_kanban_tasks_v1');
+      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('cards_dungeons_kanban_tasks_v2') || localStorage.getItem('cards_dungeons_kanban_tasks_v1');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
+          parsed.forEach(t => {
+            if (t.id === 'task-1') t.column = 'done';
+          });
           const existingIds = new Set(parsed.map(t => t.id));
           const missingDefaults = DEFAULT_TASKS.filter(t => !existingIds.has(t.id));
           tasks = [...parsed, ...missingDefaults];

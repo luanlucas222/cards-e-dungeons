@@ -5,6 +5,12 @@
 
 import { CardRenderer } from './CardRenderer.js';
 import { CARDS } from '../data/cards.js';
+import {
+  TALENT_DEFINITIONS,
+  getMetaProgression,
+  upgradeTalent,
+  resetTalents
+} from '../data/talents.js';
 
 export class ViewManager {
   /**
@@ -57,7 +63,8 @@ export class ViewManager {
       event: document.getElementById('modal-event'),
       actTransition: document.getElementById('modal-act-transition'),
       cardSwap: document.getElementById('modal-card-swap'),
-      treasure: document.getElementById('modal-treasure')
+      treasure: document.getElementById('modal-treasure'),
+      talents: document.getElementById('modal-talents')
     };
 
     // Barra de Poções (Fase 3)
@@ -496,6 +503,10 @@ export class ViewManager {
       } else {
         headerEl.style.display = 'flex';
       }
+    }
+
+    if (screenKey === 'menu') {
+      this.updateMenuSoulsBadge();
     }
 
     if (typeof window !== 'undefined' && window.GamepadManager) {
@@ -1479,5 +1490,162 @@ export class ViewManager {
     }
 
     this.openModal(modal);
+  }
+
+  /**
+   * Atualiza o contador de almas no botão do menu principal
+   */
+  updateMenuSoulsBadge() {
+    const meta = getMetaProgression();
+    const countEl = document.getElementById('menu-souls-count');
+    if (countEl) {
+      countEl.textContent = `${meta.souls} Almas`;
+    }
+  }
+
+  /**
+   * Abre o Modal do Santuário de Talentos Ancestrais
+   */
+  openTalentsModal() {
+    const modal = this.modals.talents;
+    if (!modal) return;
+
+    this.renderTalentsModal();
+
+    // Bind botões do modal se ainda não vinculados
+    const btnClose = modal.querySelector('#btn-close-talents');
+    if (btnClose && !btnClose.dataset.bound) {
+      btnClose.dataset.bound = 'true';
+      btnClose.addEventListener('click', () => this.closeModal(modal));
+    }
+
+    const btnCloseHeader = modal.querySelector('#btn-close-talents-header');
+    if (btnCloseHeader && !btnCloseHeader.dataset.bound) {
+      btnCloseHeader.dataset.bound = 'true';
+      btnCloseHeader.addEventListener('click', () => this.closeModal(modal));
+    }
+
+    const btnReset = modal.querySelector('#btn-reset-talents');
+    if (btnReset && !btnReset.dataset.bound) {
+      btnReset.dataset.bound = 'true';
+      btnReset.addEventListener('click', () => this.resetTalentsFromModal());
+    }
+
+    this.openModal(modal);
+  }
+
+  /**
+   * Renderiza a grade de cartas de talentos e saldo de almas no modal
+   */
+  renderTalentsModal() {
+    const modal = this.modals.talents;
+    if (!modal) return;
+
+    const meta = getMetaProgression();
+    const soulsBalanceEl = modal.querySelector('#modal-souls-balance');
+    if (soulsBalanceEl) {
+      soulsBalanceEl.textContent = `${meta.souls} Almas`;
+    }
+    this.updateMenuSoulsBadge();
+
+    const gridEl = modal.querySelector('#talents-grid');
+    if (!gridEl) return;
+    gridEl.innerHTML = '';
+
+    Object.values(TALENT_DEFINITIONS).forEach(def => {
+      const currentLevel = meta.talents[def.id] || 0;
+      const isMax = currentLevel >= def.maxLevel;
+      const nextCost = isMax ? null : def.costs[currentLevel];
+      const canAfford = !isMax && meta.souls >= nextCost;
+
+      const card = document.createElement('div');
+      card.className = 'talent-card';
+
+      // Pips de nível
+      let pipsHtml = '<div class="talent-pips-row">';
+      for (let i = 1; i <= def.maxLevel; i++) {
+        pipsHtml += `<div class="talent-pip ${i <= currentLevel ? 'active' : ''}"></div>`;
+      }
+      pipsHtml += '</div>';
+
+      const currentBonusText = currentLevel > 0
+        ? def.getBonusText(currentLevel)
+        : 'Nenhum bônus ativo';
+
+      const nextPreviewText = isMax
+        ? '✦ Poder Ancestral Pleno Atingido!'
+        : `Próximo nível: ${def.getBonusText(currentLevel + 1)}`;
+
+      card.innerHTML = `
+        <div class="talent-card-header">
+          <div class="talent-title-group">
+            <span class="talent-icon">${def.icon}</span>
+            <div>
+              <div class="talent-name">${def.name}</div>
+              <div class="talent-level-badge">Nv. ${currentLevel} / ${def.maxLevel}</div>
+            </div>
+          </div>
+        </div>
+        ${pipsHtml}
+        <div class="talent-desc">${def.description}</div>
+        <div class="talent-bonus-preview">
+          <div><strong>Atual:</strong> ${currentBonusText}</div>
+          <div style="color: ${isMax ? '#fae48c' : '#c4b5fd'}; margin-top: 2px;">${nextPreviewText}</div>
+        </div>
+        <div class="talent-footer">
+          ${isMax ? `
+            <button class="btn btn-talent-upgrade btn-talent-max" disabled>
+              <span>⭐ NÍVEL MÁXIMO</span>
+            </button>
+          ` : `
+            <button class="btn btn-talent-upgrade btn-upgrade-node" ${canAfford ? '' : 'disabled'}>
+              <span>Aprimorar</span>
+              <span>🔮 ${nextCost}</span>
+            </button>
+          `}
+        </div>
+      `;
+
+      if (!isMax) {
+        const upgradeBtn = card.querySelector('.btn-upgrade-node');
+        if (upgradeBtn) {
+          upgradeBtn.addEventListener('click', () => {
+            const res = upgradeTalent(def.id);
+            if (res.success) {
+              if (typeof window !== 'undefined' && window.SoundFX && window.SoundFX.playBuff) {
+                window.SoundFX.playBuff();
+              }
+              this.showToast(res.message, 'success');
+              this.renderTalentsModal();
+            } else {
+              this.showToast(res.message, 'error');
+            }
+          });
+        }
+      }
+
+      gridEl.appendChild(card);
+    });
+  }
+
+  /**
+   * Reseta todos os talentos e devolve todas as Essências de Almas
+   */
+  resetTalentsFromModal() {
+    const meta = getMetaProgression();
+    const hasAny = Object.values(meta.talents).some(lvl => lvl > 0);
+    if (!hasAny) {
+      this.showToast('Nenhum talento foi adquirido para redefinir.', 'info');
+      return;
+    }
+
+    if (confirm('Deseja redefinir todos os talentos e reembolsar 100% das Essências de Almas investidas?')) {
+      const res = resetTalents();
+      if (typeof window !== 'undefined' && window.SoundFX && window.SoundFX.playCoins) {
+        window.SoundFX.playCoins();
+      }
+      this.showToast(`✨ Talentos redefinidos! +🔮 ${res.refundedSouls} Almas reembolsadas.`, 'success');
+      this.renderTalentsModal();
+    }
   }
 }

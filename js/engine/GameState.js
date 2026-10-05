@@ -26,6 +26,7 @@ import { createPotionInstance, getRandomPotion, MAX_POTION_SLOTS } from '../data
 import { getRandomNarrativeEvent } from '../data/narrativeEvents.js';
 import { MapGenerator, NODE_TYPES, NODE_STATES } from './MapGenerator.js';
 import { CombatSystem, COMBAT_STATES } from './CombatSystem.js';
+import { applyTalentBonusesToHero, addSouls, calculateSoulsReward } from '../data/talents.js';
 
 export const GAME_SCREENS = {
   TITLE: 'title',
@@ -95,6 +96,8 @@ export class GameState {
     this.combatRewardCards = [];
     this.combatRewardPotion = null;
     this.combatRewardGold = 0;
+    this.combatRewardSouls = 0;
+    this.runSoulsEarned = 0;
     this.shrineCardOptions = [];
     this.eliteRewardRelic = null;
     this.runHistory = [];
@@ -137,6 +140,9 @@ export class GameState {
       addRelicToHero(this.hero, heroClass.startingRelicId);
     }
 
+    // Aplica bônus permanentes da Árvore de Talentos
+    applyTalentBonusesToHero(this.hero);
+
     const mapGen = new MapGenerator({
       act: this.currentAct,
       totalFloors: options.totalFloors || 15,
@@ -148,6 +154,8 @@ export class GameState {
     this.combatRewardCards = [];
     this.combatRewardPotion = null;
     this.combatRewardGold = 0;
+    this.combatRewardSouls = 0;
+    this.runSoulsEarned = 0;
     this.shrineCardOptions = [];
     this.eliteRewardRelic = null;
     this.merchantInventories = {};
@@ -272,12 +280,21 @@ export class GameState {
       this.combatRewardGold = this.currentCombat.goldReward || 0;
       this.hero.gold = (this.hero.gold || 0) + this.combatRewardGold;
 
+      // Recompensa de Essências de Almas (Meta-Progressão Permanente)
+      const soulsEarned = calculateSoulsReward(this.currentNode?.type);
+      this.combatRewardSouls = soulsEarned;
+      this.runSoulsEarned = (this.runSoulsEarned || 0) + soulsEarned;
+      addSouls(soulsEarned);
+
       if (this.currentNode && this.currentNode.type === NODE_TYPES.BOSS) {
         if (this.currentAct < this.totalActs) {
           // Conquistou o Chefe do Ato atual (Ato 1 ou 2) -> Transição de Ato com Recuperação de Fôlego!
           this.screen = GAME_SCREENS.ACT_TRANSITION;
         } else {
           // Derrotou o Grande Dragão Tirano no Ato Final (Ato 3) -> Fim de jogo e Vitória Suprema!
+          const victoryBonusSouls = 30;
+          this.runSoulsEarned = (this.runSoulsEarned || 0) + victoryBonusSouls;
+          addSouls(victoryBonusSouls);
           this.screen = GAME_SCREENS.VICTORY;
           this.clearSavedRun();
         }

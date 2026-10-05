@@ -38,6 +38,7 @@ const filesInOrder = [
   'js/data/merchant.js',
   'js/data/potions.js',
   'js/data/narrativeEvents.js',
+  'js/data/talents.js',
   'js/engine/MapGenerator.js',
   'js/engine/CombatSystem.js',
   'js/engine/GameState.js',

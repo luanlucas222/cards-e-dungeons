@@ -3,7 +3,7 @@
  * Service Worker para execução 100% offline do jogo "Cards e Dungeons" em celulares e navegadores.
  */
 
-const CACHE_NAME = 'cards-dungeons-v1.1.1';
+const CACHE_NAME = 'cards-dungeons-v1.2.0';
 
 const PRECACHE_ASSETS = [
   './',

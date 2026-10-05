@@ -64,6 +64,9 @@ export class CombatSystem {
    */
   _initCombat() {
     this.hero.block = 0;
+    if (this.hero.talentStartingBlock > 0) {
+      this.hero.block += this.hero.talentStartingBlock;
+    }
     this.hero.energy = this.hero.maxEnergy || 3;
 
     // Inicializa ou preserva mapas de status
@@ -147,8 +150,12 @@ export class CombatSystem {
       return;
     }
 
-    // Compra 5 cartas
-    this.drawCards(5);
+    // Compra 5 cartas (ou mais se houver bônus de Mente Expandida no Turno 1)
+    const initialBonus = (isFirstTurn && this.hero.talentInitialCards > 0) ? this.hero.talentInitialCards : 0;
+    if (initialBonus > 0) {
+      this._log(`O talento [Mente Expandida] concede +${initialBonus} carta(s) no Turno 1!`);
+    }
+    this.drawCards(5 + initialBonus);
   }
 
   /**
@@ -778,6 +785,11 @@ export class CombatSystem {
       this.goldReward = 35 + Math.floor(this.rng() * 16);
     } else {
       this.goldReward = 15 + Math.floor(this.rng() * 11);
+    }
+
+    if (this.hero.talentGoldBonus > 0) {
+      this.goldReward += this.hero.talentGoldBonus;
+      this._log(`O talento [Avareza dos Abismos] concedeu +${this.hero.talentGoldBonus} de ouro bônus!`);
     }
 
     this._log(`Vitória gloriosa! Você derrotou ${this.enemy.name}! (+${this.goldReward} ouro)`);

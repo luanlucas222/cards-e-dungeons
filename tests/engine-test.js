@@ -95,6 +95,17 @@ import {
   NARRATIVE_EVENTS,
   getRandomNarrativeEvent
 } from '../js/data/narrativeEvents.js';
+import {
+  TALENT_DEFINITIONS,
+  getMetaProgression,
+  saveMetaProgression,
+  addSouls,
+  upgradeTalent,
+  resetTalents,
+  getTalentBonuses,
+  applyTalentBonusesToHero,
+  calculateSoulsReward
+} from '../js/data/talents.js';
 
 let passedTests = 0;
 let totalTests = 0;
@@ -2311,6 +2322,105 @@ test('swapActiveAndReserveCard: Troca bidirecional imediata entre ativo e reserv
   assert.strictEqual(swapped, true);
   assert.strictEqual(gs.hero.deck.some(c => c.uid === reserveCard.uid), true);
   assert.strictEqual(gs.hero.reserveDeck.some(c => c.uid === activeCard.uid), true);
+});
+
+// ============================================================================
+// META-PROGRESSÃO & ÁRVORE DE TALENTOS ANCESTRAIS
+// ============================================================================
+console.log('\n--- Testes: Meta-Progressão & Árvore de Talentos Permanentes ---');
+
+test('Talentos: Adição e persistência de Essências de Almas', () => {
+  saveMetaProgression({ souls: 0, totalSoulsEarned: 0, talents: { vitality: 0, greed: 0, wisdom: 0, ironclad: 0 } });
+  assert.strictEqual(getMetaProgression().souls, 0);
+
+  addSouls(50);
+  const meta = getMetaProgression();
+  assert.strictEqual(meta.souls, 50);
+  assert.strictEqual(meta.totalSoulsEarned, 50);
+});
+
+test('Talentos: Aprimoramento e dedução de custo de almas', () => {
+  saveMetaProgression({ souls: 30, totalSoulsEarned: 30, talents: { vitality: 0, greed: 0, wisdom: 0, ironclad: 0 } });
+  
+  // Nível 1 de Vitalidade custa 10 almas
+  const res1 = upgradeTalent('vitality');
+  assert.strictEqual(res1.success, true);
+  assert.strictEqual(res1.newLevel, 1);
+  assert.strictEqual(res1.remainingSouls, 20);
+
+  // Nível 2 de Vitalidade custa 20 almas
+  const res2 = upgradeTalent('vitality');
+  assert.strictEqual(res2.success, true);
+  assert.strictEqual(res2.newLevel, 2);
+  assert.strictEqual(res2.remainingSouls, 0);
+
+  // Sem almas suficientes para Nível 3 (custa 35)
+  const res3 = upgradeTalent('vitality');
+  assert.strictEqual(res3.success, false);
+});
+
+test('Talentos: Redefinir e reembolsar 100% das almas', () => {
+  saveMetaProgression({ souls: 0, totalSoulsEarned: 30, talents: { vitality: 2, greed: 0, wisdom: 0, ironclad: 0 } });
+  
+  const resetRes = resetTalents();
+  assert.strictEqual(resetRes.refundedSouls, 30); // 10 + 20
+  assert.strictEqual(resetRes.totalSouls, 30);
+  assert.strictEqual(getMetaProgression().talents.vitality, 0);
+});
+
+test('Talentos: Aplicação de bônus ao Herói no início da run', () => {
+  saveMetaProgression({ souls: 100, totalSoulsEarned: 100, talents: { vitality: 2, greed: 3, wisdom: 1, ironclad: 1 } });
+  
+  const bonuses = getTalentBonuses();
+  assert.strictEqual(bonuses.maxHpBonus, 10); // 2 * 5
+  assert.strictEqual(bonuses.goldBonus, 3); // 3 * 1
+  assert.strictEqual(bonuses.initialCardsBonus, 1); // 1 * 1
+  assert.strictEqual(bonuses.startingBlockBonus, 3); // 1 * 3
+
+  const gs = new GameState({ seed: 12345 });
+  gs.startNewRun('warrior');
+  // Guerreiro base maxHp é 70 -> com talento vitality 2 vira 80
+  assert.strictEqual(gs.hero.maxHp, 80);
+  assert.strictEqual(gs.hero.hp, 80);
+  assert.strictEqual(gs.hero.talentGoldBonus, 3);
+  assert.strictEqual(gs.hero.talentInitialCards, 1);
+  assert.strictEqual(gs.hero.talentStartingBlock, 3);
+});
+
+test('Talentos: Integração no Combate (Armadura inicial e compra bônus no Turno 1)', () => {
+  saveMetaProgression({ souls: 100, totalSoulsEarned: 100, talents: { vitality: 0, greed: 2, wisdom: 1, ironclad: 1 } });
+  
+  const gs = new GameState({ seed: 77777 });
+  gs.startNewRun('warrior');
+
+  const enemy = createEnemyInstance('goblin_ladino');
+  const combat = new CombatSystem({ hero: gs.hero, enemy, rng: gs.rng });
+
+  // Bastião de Ferro: inicia combate com +3 de armadura
+  assert.strictEqual(gs.hero.block, 3);
+
+  // Mente Expandida: compra 5 + 1 = 6 cartas no Turno 1
+  assert.strictEqual(combat.hand.length, 6);
+});
+
+test('Talentos: Recompensa de Almas ao derrotar inimigo em GameState', () => {
+  saveMetaProgression({ souls: 0, totalSoulsEarned: 0, talents: { vitality: 0, greed: 0, wisdom: 0, ironclad: 0 } });
+  
+  const gs = new GameState({ seed: 88888 });
+  gs.startNewRun('warrior');
+
+  const node = Object.values(gs.map.nodes).find(n => n.type === NODE_TYPES.COMBAT);
+  node.state = NODE_STATES.AVAILABLE;
+  gs.selectNode(node.id);
+
+  // Vence o combate
+  gs.currentCombat.enemy.hp = 0;
+  gs.currentCombat._handleVictory();
+  gs._checkCombatTermination();
+
+  assert.strictEqual(gs.combatRewardSouls > 0, true, 'Deve conceder recompensa de almas');
+  assert.strictEqual(gs.runSoulsEarned, gs.combatRewardSouls);
+  assert.strictEqual(getMetaProgression().souls, gs.combatRewardSouls);
 });
 
 console.log('\n====================================================');

@@ -157,6 +157,10 @@
             <span class="btn-icon-symbol">⚔️</span>
             <span>Nova Jornada</span>
           </button>
+          <button id="btn-talents" class="btn btn-menu-hero btn-talents-purple" style="background: linear-gradient(180deg, #581c87 0%, #3b0764 100%); border-color: #c084fc;">
+            <span class="btn-icon-symbol">✨</span>
+            <span>Árvore de Talentos (<span id="menu-souls-count">0 Almas</span>)</span>
+          </button>
           <button id="btn-menu-guide" class="btn btn-menu-secondary">
             <span class="btn-icon-symbol">📜</span>
             <span>Como Jogar</span>
@@ -327,6 +331,10 @@
               <div id="stat-victory-deck" class="stat-box-val">12</div>
               <div class="stat-box-label">Cartas Finais</div>
             </div>
+            <div class="stat-box" style="border-color: #a855f7;">
+              <div id="stat-victory-souls" class="stat-box-val" style="color: #c084fc;">+0</div>
+              <div class="stat-box-label">Almas Colhidas</div>
+            </div>
           </div>
 
           <div class="game-over-actions">
@@ -342,7 +350,7 @@
           <div id="defeat-icon-box" class="game-over-icon"></div>
           <h1 class="game-over-title">VOCÊ TOMBOU...</h1>
           <p id="defeat-subtitle" class="game-over-subtitle">
-            Sua jornada encontrou um fim trágico nas trevas da masmorra. Recupere o ânimo e tente novamente!
+            Sua jornada encontrou um fim trágico nas trevas da masmorra. Suas Essências de Almas foram preservadas no Santuário de Talentos!
           </p>
 
           <div class="game-over-stats">
@@ -357,6 +365,10 @@
             <div class="stat-box">
               <div id="stat-defeat-deck" class="stat-box-val">12</div>
               <div class="stat-box-label">Cartas no Deck</div>
+            </div>
+            <div class="stat-box" style="border-color: #a855f7;">
+              <div id="stat-defeat-souls" class="stat-box-val" style="color: #c084fc;">+0</div>
+              <div class="stat-box-label">Almas Resgatadas</div>
             </div>
           </div>
 
@@ -601,6 +613,8 @@
             </div>
             <!-- Banner de Ouro Coletado (Fase 4) -->
             <div id="reward-gold-box" class="reward-gold-banner">🪙 +<span id="reward-gold-amount">20</span> Ouro Coletado!</div>
+            <!-- Banner de Almas Coletadas (Meta-Progressão) -->
+            <div id="reward-souls-box" class="reward-gold-banner" style="background: rgba(168, 85, 247, 0.2); border-color: #c084fc; color: #e9d5ff;">🔮 +<span id="reward-souls-amount">2</span> Almas!</div>
           </div>
 
           <!-- Banner de Relíquia de Elite conquistada -->
@@ -854,6 +868,39 @@
         <div class="modal-footer">
           <button id="btn-proceed-act" class="btn btn-primary-gold btn-large">
             <span id="btn-proceed-act-text">Descer para o Ato II ➔</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Árvore de Talentos & Meta-Progressão Permanente -->
+    <div id="modal-talents" class="modal-backdrop">
+      <div class="modal-window modal-talents-window" style="max-width: 680px;">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span style="color: #c084fc;">✨</span>
+            <span style="color: var(--gold-light);">Santuário dos Talentos Ancestrais</span>
+          </div>
+          <div class="talents-souls-header-badge">
+            <span>🔮</span>
+            <span id="modal-souls-balance">0 Almas</span>
+          </div>
+          <button class="modal-close-btn" id="btn-close-talents-header" aria-label="Fechar">&times;</button>
+        </div>
+        <div class="modal-body talents-modal-body">
+          <p class="talents-lore-subtitle">
+            Gaste as <strong>Essências de Almas</strong> colhidas dos monstros e chefes para gravar runas permanentes na sua alma. Estes bônus nunca são perdidos ao morrer!
+          </p>
+          <div class="talents-grid" id="talents-grid">
+            <!-- Preenchido dinamicamente via ViewManager -->
+          </div>
+        </div>
+        <div class="modal-footer talents-modal-footer">
+          <button id="btn-reset-talents" class="btn btn-secondary">
+            <span>🔄 Redefinir Talentos (Reembolsar)</span>
+          </button>
+          <button id="btn-close-talents" class="btn btn-primary-gold modal-close-btn-bottom">
+            <span>Fechar Santuário</span>
           </button>
         </div>
       </div>

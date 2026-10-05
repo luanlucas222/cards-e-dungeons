@@ -85,6 +85,14 @@ class GameApp {
       });
     }
 
+    // Botão Árvore de Talentos no Menu
+    const btnTalents = document.getElementById('btn-talents');
+    if (btnTalents) {
+      btnTalents.addEventListener('click', () => {
+        this.viewManager.openTalentsModal();
+      });
+    }
+
     // Botão Como Jogar no Menu
     const btnMenuGuide = document.getElementById('btn-menu-guide');
     if (btnMenuGuide) {
@@ -508,6 +516,17 @@ class GameApp {
       goldBox.style.display = 'flex';
     }
 
+    // Recompensa de Almas (Meta-Progressão)
+    const soulsBox = rewardModal.querySelector('#reward-souls-box');
+    const soulsAmountEl = rewardModal.querySelector('#reward-souls-amount');
+    const soulsEarned = this.gameState.combatRewardSouls || 2;
+    if (soulsAmountEl) {
+      soulsAmountEl.textContent = soulsEarned;
+    }
+    if (soulsBox) {
+      soulsBox.style.display = 'flex';
+    }
+
     if (window.SoundFX && typeof window.SoundFX.playCoins === 'function') {
       try {
         window.SoundFX.playCoins();
@@ -658,16 +677,18 @@ class GameApp {
     const statsFloor = victoryScreen.querySelector('#stat-victory-floors');
     const statsMonsters = victoryScreen.querySelector('#stat-victory-monsters');
     const statsDeck = victoryScreen.querySelector('#stat-victory-deck');
+    const statsSouls = victoryScreen.querySelector('#stat-victory-souls');
 
     const totalConqueredFloors = 30; // 3 Atos de 10 andares
     if (statsFloor) statsFloor.textContent = `${totalConqueredFloors}`;
     if (statsMonsters) statsMonsters.textContent = `${this.monstersDefeated}`;
     if (statsDeck) statsDeck.textContent = `${this.gameState.hero.deck.length}`;
+    if (statsSouls) statsSouls.textContent = `+${this.gameState.runSoulsEarned || 0}`;
 
     const subtitleEl = victoryScreen.querySelector('.game-over-subtitle');
     const timeFormatted = this.viewManager.formatRunTime(this.gameState.elapsedTime || 0);
     if (subtitleEl) {
-      subtitleEl.innerHTML = `O Grande Dragão Tirano sucumbiu no Ato III! Você conquistou todos os 30 andares do calabouço em <strong>⏱️ ${timeFormatted}</strong> de pura bravura e maestria estratégica.`;
+      subtitleEl.innerHTML = `O Grande Dragão Tirano sucumbiu no Ato III! Você conquistou todos os 30 andares do calabouço em <strong>⏱️ ${timeFormatted}</strong> de pura bravura e maestria estratégica. Suas <strong>+🔮 ${this.gameState.runSoulsEarned || 0} Essências de Almas</strong> foram consagradas!`;
     }
 
     const iconEl = victoryScreen.querySelector('#victory-icon-box');
@@ -687,16 +708,18 @@ class GameApp {
     const statsFloor = defeatScreen.querySelector('#stat-defeat-floors');
     const statsMonsters = defeatScreen.querySelector('#stat-defeat-monsters');
     const statsDeck = defeatScreen.querySelector('#stat-defeat-deck');
+    const statsSouls = defeatScreen.querySelector('#stat-defeat-souls');
     const subtitleEl = defeatScreen.querySelector('#defeat-subtitle');
 
     if (statsFloor) statsFloor.textContent = `Ato ${act} (F${currentFloor})`;
     if (statsMonsters) statsMonsters.textContent = `${this.monstersDefeated}`;
     if (statsDeck) statsDeck.textContent = `${this.gameState.hero.deck.length}`;
+    if (statsSouls) statsSouls.textContent = `+${this.gameState.runSoulsEarned || 0}`;
 
     const timeFormatted = this.viewManager.formatRunTime(this.gameState.elapsedTime || 0);
     if (subtitleEl && this.gameState.currentCombat) {
       const killer = this.gameState.currentCombat.enemy.name;
-      subtitleEl.innerHTML = `Você foi superado pelas forças de <strong>${killer}</strong> no Ato ${act} após <strong>⏱️ ${timeFormatted}</strong>. Recupere o ânimo e tente novamente!`;
+      subtitleEl.innerHTML = `Você foi superado pelas forças de <strong>${killer}</strong> no Ato ${act} após <strong>⏱️ ${timeFormatted}</strong>. Suas <strong>+🔮 ${this.gameState.runSoulsEarned || 0} Essências de Almas</strong> foram resgatadas para a Árvore de Talentos!`;
     }
 
     const iconEl = defeatScreen.querySelector('#defeat-icon-box');
