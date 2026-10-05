@@ -440,49 +440,66 @@
 }
 
 /* ==========================================================================
-   OTIMIZAÇÃO MOBILE LANDSCAPE (TELAS DEITADAS <= 460px de altura)
+   OTIMIZAÇÃO ERGONÔMICA PROPORCIONAL TCG (TELAS DEITADAS <= 520px de altura)
    ========================================================================== */
-@media (max-height: 460px) and (orientation: landscape) {
+@media (max-height: 520px) and (orientation: landscape) {
   .game-card {
-    padding: 4px;
-    border-radius: 7px;
+    padding: 6px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .card-cost {
+    width: 26px;
+    height: 26px;
+    font-size: 0.92rem;
+    top: -5px;
+    left: -5px;
   }
   .card-header {
-    height: 18px;
+    height: 22px;
     margin-bottom: 2px;
-    padding-left: 14px;
+    padding: 0 2px 0 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .card-title {
-    font-size: 0.64rem;
+    font-size: clamp(0.56rem, 1.45vh, 0.65rem);
+    letter-spacing: 0.1px;
+    line-height: 1.1;
   }
   .card-art-frame {
-    min-height: 36px;
-    max-height: 48px;
-    border-radius: 4px;
+    height: clamp(56px, 15vh, 74px);
+    min-height: 56px;
+    max-height: 74px;
+    border-radius: 5px;
   }
   .card-art-frame img,
   .card-art-frame svg {
-    max-height: 38px;
+    max-height: 100%;
+    width: 100%;
+    object-fit: cover;
   }
-  .card-cost {
-    width: 22px;
-    height: 22px;
-    font-size: 0.78rem;
-    top: -4px;
-    left: -4px;
+  .card-type-banner,
+  .card-type-badge {
+    font-size: 0.60rem;
+    height: 18px;
+    margin: 3px 0;
+    padding: 1px 4px;
   }
   .card-body {
-    padding: 2px 2px 0;
-    gap: 2px;
+    padding: 3px 6px;
+    min-height: 48px;
+    max-height: 64px;
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .card-description {
-    font-size: 0.62rem;
-    line-height: 1.15;
-    padding: 1px 2px;
-  }
-  .card-type-badge {
-    font-size: 0.54rem;
-    padding: 1px 4px;
+    font-size: clamp(0.62rem, 1.5vh, 0.72rem);
+    line-height: 1.22;
+    padding: 0;
   }
 }
 

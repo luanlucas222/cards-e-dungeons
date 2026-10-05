@@ -973,102 +973,110 @@
 }
 
 /* ==========================================================================
-   OTIMIZAÇÃO ERGONÔMICA MOBILE LANDSCAPE (ALTURA <= 460px)
+   OTIMIZAÇÃO ERGONÔMICA MOBILE LANDSCAPE (ALTURA <= 520px)
    ========================================================================== */
-@media (max-height: 460px) and (orientation: landscape) {
+@media (max-height: 520px) and (orientation: landscape) {
   .combat-top-bar {
-    padding: 4px 16px;
-    min-height: 36px;
+    padding: 3px 16px;
+    min-height: 32px;
   }
   .encounter-title {
-    font-size: 0.88rem;
+    font-size: 0.85rem;
   }
   .turn-counter-badge {
-    font-size: 0.72rem;
-    padding: 2px 8px;
+    font-size: 0.70rem;
+    padding: 2px 7px;
   }
   .combat-stage {
-    padding: 4px 12px;
+    padding: 2px 14px;
     gap: 8px;
     flex: 1;
     min-height: 0;
   }
   .combatant {
-    width: clamp(100px, 18vw, 135px);
+    width: clamp(90px, 16vw, 125px);
   }
   .combatant-avatar-frame {
-    width: clamp(62px, 15vh, 80px);
-    height: clamp(62px, 15vh, 80px);
+    width: clamp(54px, 14vh, 72px);
+    height: clamp(54px, 14vh, 72px);
     margin-bottom: 2px;
   }
   .enemy-combatant.is-boss .combatant-avatar-frame {
-    width: clamp(78px, 18vh, 98px);
-    height: clamp(78px, 18vh, 98px);
+    width: clamp(70px, 17vh, 88px);
+    height: clamp(70px, 17vh, 88px);
   }
   .intent-box {
     margin-bottom: 2px;
-    padding: 2px 6px;
+    padding: 1px 6px;
   }
   .intent-description {
-    font-size: 0.65rem;
+    font-size: 0.62rem;
   }
   .intent-damage {
-    font-size: 0.8rem;
+    font-size: 0.76rem;
   }
   .combatant-name {
-    font-size: 0.76rem;
-    margin-bottom: 2px;
+    font-size: 0.72rem;
+    margin-bottom: 1px;
   }
   .hp-bar {
-    height: 14px;
+    height: 12px;
   }
   .hp-text {
-    font-size: 0.68rem;
+    font-size: 0.64rem;
   }
   .status-badges-container {
-    min-height: 20px;
-    gap: 4px;
-    margin-top: 2px;
+    min-height: 18px;
+    gap: 3px;
+    margin-top: 1px;
   }
   .status-badge {
     padding: 1px 4px;
-    font-size: 0.62rem;
+    font-size: 0.60rem;
   }
   .combat-bottom-bar {
-    padding: 0 10px 4px;
-    height: clamp(130px, 36vh, 155px);
+    padding: 0 14px 6px;
+    height: clamp(174px, 48vh, 202px);
+  }
+  .player-hand-container {
+    bottom: 8px;
+    height: 100%;
   }
   .player-hand {
-    height: clamp(125px, 35vh, 150px);
+    height: clamp(170px, 47vh, 196px);
+    align-items: flex-end;
+    padding-bottom: 4px;
   }
   .player-hand .game-card {
-    margin: 0 clamp(-38px, -4.2vw, -22px);
+    margin: 0 clamp(-12px, -1.2vw, -2px);
+    transform-origin: center bottom;
   }
   .combat-left-controls,
   .combat-right-controls {
     gap: 8px;
+    margin-bottom: 4px;
   }
   .energy-container {
-    margin-top: 4px;
+    margin-top: 2px;
     gap: 6px;
   }
   .energy-orb {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
   }
   .energy-text {
     font-size: 0.82rem;
   }
   .pile-visual {
-    width: 36px;
-    height: 50px;
+    width: 38px;
+    height: 52px;
   }
   .pile-count-badge {
     font-size: 0.68rem;
     padding: 1px 5px;
   }
   .btn-end-turn {
-    padding: 7px 14px;
+    padding: 8px 14px;
     font-size: 0.82rem;
     min-width: 90px;
   }
