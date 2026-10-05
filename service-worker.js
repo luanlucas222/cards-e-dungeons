@@ -8,6 +8,7 @@ const CACHE_NAME = 'cards-dungeons-v1.1.0';
 const PRECACHE_ASSETS = [
   './',
   './index.html',
+  './dev-board.html',
   './manifest.json',
   './css/main.css',
   './css/cards.css',

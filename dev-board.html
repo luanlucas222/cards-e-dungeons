@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cards e Dungeons — Quadro de Desenvolvimento & Roadmap (Kanban)</title>
+  
+  <!-- Fontes Cinzel & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-deep: #08090d;
+      --bg-primary: #10121a;
+      --bg-secondary: #171924;
+      --bg-card: #1c1f2e;
+      --bg-card-hover: #25293d;
+      --border-subtle: #2b2f44;
+      --border-gold: #c99e32;
+      --gold-primary: #d4af37;
+      --gold-light: #fae48c;
+      --text-main: #f0f2f7;
+      --text-muted: #9aa0b6;
+      --text-dim: #5e6378;
+      
+      --color-high: #ef4444;
+      --color-med: #f59e0b;
+      --color-low: #10b981;
+      --color-done: #3b82f6;
+      
+      --font-fantasy: 'Cinzel', serif;
+      --font-ui: 'Inter', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-deep);
+      background-image: 
+        radial-gradient(circle at 50% 10%, rgba(212, 175, 55, 0.08) 0%, transparent 60%),
+        radial-gradient(circle at 10% 90%, rgba(239, 68, 68, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 90% 90%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+      color: var(--text-main);
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Top Bar Header */
+    header {
+      background: rgba(16, 18, 26, 0.95);
+      border-bottom: 1.5px solid var(--border-subtle);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      font-size: 1.6rem;
+    }
+
+    .brand-title {
+      font-family: var(--font-fantasy);
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--gold-light);
+      letter-spacing: 0.5px;
+    }
+
+    .brand-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-secondary);
+      color: var(--text-main);
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--gold-primary);
+      color: #ffffff;
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #d4af37, #997819);
+      border-color: #fae48c;
+      color: #0d0f17;
+      font-weight: 800;
+    }
+
+    .btn-gold:hover {
+      background: linear-gradient(135deg, #fae48c, #d4af37);
+      box-shadow: 0 0 14px rgba(212, 175, 55, 0.4);
+    }
+
+    /* Filter Bar */
+    .filter-bar {
+      background: rgba(23, 25, 36, 0.8);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-label {
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      letter-spacing: 0.5px;
+    }
+
+    .filter-pill {
+      padding: 4px 10px;
+      border-radius: 14px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .filter-pill.active {
+      background: var(--gold-primary);
+      color: #0b0c10;
+      border-color: var(--gold-light);
+      font-weight: 800;
+    }
+
+    /* Kanban Board Columns */
+    main {
+      flex: 1;
+      padding: 20px 24px;
+      display: flex;
+      gap: 18px;
+      overflow-x: auto;
+      align-items: flex-start;
+    }
+
+    .kanban-col {
+      flex: 0 0 320px;
+      background: rgba(16, 18, 26, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      max-height: calc(100vh - 150px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    }
+
+    .col-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .col-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .col-title {
+      font-family: var(--font-fantasy);
+      font-size: 0.94rem;
+      font-weight: 800;
+      color: var(--gold-light);
+      letter-spacing: 0.3px;
+    }
+
+    .col-badge {
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+    }
+
+    .col-cards {
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 120px;
+    }
+
+    /* Kanban Card */
+    .kanban-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 12px 14px;
+      cursor: grab;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      position: relative;
+      user-select: none;
+    }
+
+    .kanban-card:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(212, 175, 55, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+    }
+
+    .kanban-card.dragging {
+      opacity: 0.4;
+      cursor: grabbing;
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .card-tags {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .tag-priority-high {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+    }
+
+    .tag-priority-med {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid #f59e0b;
+      color: #fcd34d;
+    }
+
+    .tag-priority-low {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid #10b981;
+      color: #86efac;
+    }
+
+    .tag-category {
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-muted);
+    }
+
+    .card-title {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.35;
+      margin-bottom: 6px;
+    }
+
+    .card-desc {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-bottom: 10px;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 8px;
+      margin-top: 4px;
+    }
+
+    .btn-copy-prompt {
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      color: var(--gold-light);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-copy-prompt:hover {
+      background: var(--gold-primary);
+      color: #0b0c10;
+      border-color: #ffffff;
+    }
+
+    .card-actions-dropdown {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-icon {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 0.8rem;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+
+    .btn-icon:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Modal Criar Tarefa */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--bg-primary);
+      border: 1.5px solid var(--border-gold);
+      border-radius: 10px;
+      width: 100%;
+      max-width: 480px;
+      padding: 22px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9);
+    }
+
+    .modal-title {
+      font-family: var(--font-fantasy);
+      color: var(--gold-light);
+      font-size: 1.15rem;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .form-control {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 9px 12px;
+      color: #ffffff;
+      font-family: var(--font-ui);
+      font-size: 0.85rem;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--gold-primary);
+    }
+
+    textarea.form-control {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--bg-card);
+      border: 1.5px solid var(--gold-primary);
+      color: var(--gold-light);
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+      z-index: 300;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: all 0.25s ease;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="brand">
+      <span class="brand-icon">🗡️</span>
+      <div>
+        <div class="brand-title">CARDS E DUNGEONS</div>
+        <div class="brand-subtitle">Quadro de Desenvolvimento & Gestão de Roadmap</div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-gold" onclick="openCreateModal()">+ Nova Tarefa</button>
+      <button class="btn" onclick="exportData()">💾 Salvar / Exportar</button>
+      <button class="btn" onclick="resetDefaultTasks()">🔄 Restaurar Padrão</button>
+      <a href="index.html" class="btn">🎮 Voltar ao Jogo</a>
+    </div>
+  </header>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <span class="filter-label">Prioridade:</span>
+      <button class="filter-pill active" onclick="setPriorityFilter('all')">Todas</button>
+      <button class="filter-pill" onclick="setPriorityFilter('high')">🔴 Alta</button>
+      <button class="filter-pill" onclick="setPriorityFilter('med')">🟡 Média</button>
+      <button class="filter-pill" onclick="setPriorityFilter('low')">🟢 Baixa</button>
+    </div>
+
+    <div class="filter-group">
+      <span class="filter-label">Área:</span>
+      <button class="filter-pill active" onclick="setCategoryFilter('all')">Tudo</button>
+      <button class="filter-pill" onclick="setCategoryFilter('Mecânica')">Mecânica</button>
+      <button class="filter-pill" onclick="setCategoryFilter('Cartas')">Cartas</button>
+      <button class="filter-pill" onclick="setCategoryFilter('Inimigos')">Inimigos</button>
+      <button class="filter-pill" onclick="setCategoryFilter('Interface')">Interface</button>
+      <button class="filter-pill" onclick="setCategoryFilter('Mobile')">Mobile</button>
+    </div>
+  </div>
+
+  <!-- Kanban Columns -->
+  <main id="board">
+    <!-- Coluna 1: Prioridade Alta (Próximos Passos) -->
+    <div class="kanban-col" data-col="todo-high">
+      <div class="col-header">
+        <div class="col-title-group">
+          <span style="color: var(--color-high);">🔴</span>
+          <span class="col-title">Prioridade Alta</span>
+        </div>
+        <span class="col-badge" id="badge-todo-high">0</span>
+      </div>
+      <div class="col-cards" id="col-todo-high" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'todo-high')"></div>
+    </div>
+
+    <!-- Coluna 2: Prioridade Média / Novas Ideias -->
+    <div class="kanban-col" data-col="todo-med">
+      <div class="col-header">
+        <div class="col-title-group">
+          <span style="color: var(--color-med);">🟡</span>
+          <span class="col-title">Prioridade Média</span>
+        </div>
+        <span class="col-badge" id="badge-todo-med">0</span>
+      </div>
+      <div class="col-cards" id="col-todo-med" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'todo-med')"></div>
+    </div>
+
+    <!-- Coluna 3: Em Andamento / Em Testes -->
+    <div class="kanban-col" data-col="doing">
+      <div class="col-header">
+        <div class="col-title-group">
+          <span style="color: var(--gold-primary);">⚡</span>
+          <span class="col-title">Em Andamento</span>
+        </div>
+        <span class="col-badge" id="badge-doing">0</span>
+      </div>
+      <div class="col-cards" id="col-doing" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'doing')"></div>
+    </div>
+
+    <!-- Coluna 4: Concluído (Histórico de Entregas) -->
+    <div class="kanban-col" data-col="done">
+      <div class="col-header">
+        <div class="col-title-group">
+          <span style="color: var(--color-low);">✅</span>
+          <span class="col-title">Concluído</span>
+        </div>
+        <span class="col-badge" id="badge-done">0</span>
+      </div>
+      <div class="col-cards" id="col-done" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'done')"></div>
+    </div>
+  </main>
+
+  <!-- Modal Nova Tarefa -->
+  <div class="modal-overlay" id="create-modal">
+    <div class="modal-box">
+      <h3 class="modal-title">🗡️ Adicionar Nova Tarefa ao Kanban</h3>
+      <div class="form-group">
+        <label>Título da Tarefa</label>
+        <input type="text" id="new-title" class="form-control" placeholder="Ex: Adicionar 3 novas cartas de Veneno para a Ladina">
+      </div>
+      <div class="form-group">
+        <label>Descrição & Detalhes</label>
+        <textarea id="new-desc" class="form-control" placeholder="Descreva os requisitos ou como você imagina o funcionamento..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Prioridade</label>
+        <select id="new-priority" class="form-control">
+          <option value="high">🔴 Alta (Fazer Primeiro)</option>
+          <option value="med" selected>🟡 Média (Importante)</option>
+          <option value="low">🟢 Baixa (Polimento / Ideia Futura)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Categoria / Área</label>
+        <select id="new-category" class="form-control">
+          <option value="Mecânica">Mecânica de Jogo</option>
+          <option value="Cartas">Cartas & Decks</option>
+          <option value="Inimigos">Inimigos & Chefes</option>
+          <option value="Interface">Interface & Visual</option>
+          <option value="Mobile">Mobile & Controles</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Coluna Inicial</label>
+        <select id="new-col" class="form-control">
+          <option value="todo-high">🔴 Prioridade Alta</option>
+          <option value="todo-med">🟡 Prioridade Média</option>
+          <option value="doing">⚡ Em Andamento</option>
+          <option value="done">✅ Concluído</option>
+        </select>
+      </div>
+      <div class="modal-buttons">
+        <button class="btn" onclick="closeCreateModal()">Cancelar</button>
+        <button class="btn btn-gold" onclick="saveNewTask()">Criar Tarefa</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast">Pedido copiado com sucesso!</div>
+
+  <script>
+    const STORAGE_KEY = 'cards_dungeons_kanban_tasks_v1';
+
+    const DEFAULT_TASKS = [
+      // PRIORIDADE ALTA
+      {
+        id: 'task-1',
+        title: 'Árvore de Talentos & Meta-Progressão Permanente',
+        desc: 'Permitir gastar Essências de Almas ganhas nas partidas para desbloquear bônus passivos permanentes (Vida inicial +5, +1 de Ouro por vitória, +1 de Carta inicial).',
+        priority: 'high',
+        category: 'Mecânica',
+        column: 'todo-high'
+      },
+      {
+        id: 'task-2',
+        title: 'Modo Desafio Diário (Daily Run)',
+        desc: 'Um mapa e semente diária fixa onde todos os jogadores competem com 3 modificadores aleatórios (ex: Todos começam com Veneno, Cartas custam 0 mas causam dano ao herói).',
+        priority: 'high',
+        category: 'Mecânica',
+        column: 'todo-high'
+      },
+      {
+        id: 'task-3',
+        title: 'Tela de Resumo e Estatísticas de Fim de Partida',
+        desc: 'Ao vencer ou ser derrotado, exibir infográfico com: Dano total infligido, maior combo de cartas, relíquia mais valiosa e carta mais jogada na run.',
+        priority: 'high',
+        category: 'Interface',
+        column: 'todo-high'
+      },
+      {
+        id: 'task-4',
+        title: 'Galeria do Bestiário com Lore dos Monstros',
+        desc: 'Um compêndio na tela inicial para inspecionar todos os monstros derrotados, seus pontos fracos e suas ilustrações em tela cheia.',
+        priority: 'high',
+        category: 'Inimigos',
+        column: 'todo-high'
+      },
+
+      // PRIORIDADE MÉDIA
+      {
+        id: 'task-5',
+        title: 'Nova Classe Jogável: O Clérigo da Luz',
+        desc: 'Quarto herói focado em Fé, Escudos Sagrados Divinos, Dano Radiante e cartas de julgamento dos mortos-vivos.',
+        priority: 'med',
+        category: 'Cartas',
+        column: 'todo-med'
+      },
+      {
+        id: 'task-6',
+        title: 'Sistema de Reações Elementais Combinadas',
+        desc: 'Se o inimigo estiver Queimando e receber Veneno, gera uma nuvem explosiva de vapor tóxico causando dano em área instantâneo.',
+        priority: 'med',
+        category: 'Mecânica',
+        column: 'todo-med'
+      },
+      {
+        id: 'task-7',
+        title: 'Mini-Chefes Errantes (Wandering Elites)',
+        desc: 'Eventos raros onde um caçador de recompensas aparece no meio de um nó comum com recompensas lendárias exclusivas.',
+        priority: 'med',
+        category: 'Inimigos',
+        column: 'todo-med'
+      },
+      {
+        id: 'task-8',
+        title: 'Personalização do Verso das Cartas (Card Backs)',
+        desc: 'Permitir escolher entre 4 versos colecionáveis: Clássico Rúnico, Obsidiana Dracônica, Ouro Real e Tecido Sombrio.',
+        priority: 'med',
+        category: 'Interface',
+        column: 'todo-med'
+      },
+
+      // CONCLUÍDOS (HISTÓRICO)
+      {
+        id: 'task-c1',
+        title: 'Otimização Mobile Geral para 60 FPS no Android',
+        desc: 'Eliminação do shadowBlur pesado no Canvas de combate, ajuste de altura em paisagem (max-height <= 460px) e fim do hover preso no toque.',
+        priority: 'high',
+        category: 'Mobile',
+        column: 'done'
+      },
+      {
+        id: 'task-c2',
+        title: 'Publicação PWA Online com HTTPS 24h na Nuvem',
+        desc: 'Deploy automático no GitHub Pages permitindo jogar e instalar o app no celular com o PC desligado de qualquer lugar.',
+        priority: 'high',
+        category: 'Mobile',
+        column: 'done'
+      },
+      {
+        id: 'task-c3',
+        title: 'Projeto Nativo Android com Capacitor & Ícones Oficiais',
+        desc: 'Estruturação do projeto Android Studio na pasta android/ com suporte a sensorLandscape e ícones adaptativos.',
+        priority: 'high',
+        category: 'Mobile',
+        column: 'done'
+      },
+      {
+        id: 'task-c4',
+        title: 'Expansão de 24 Novas Cartas Táticas para as 3 Classes',
+        desc: '8 novas cartas para Guerreiro (Golpe de Escudo, Muralha Viva), Ladina (Catalisador Tóxico) e Mago (Incinerar, Eco Temporal).',
+        priority: 'high',
+        category: 'Cartas',
+        column: 'done'
+      },
+      {
+        id: 'task-c5',
+        title: 'Chefes Épicos com Transição de Fase 2 (Enrage 50% HP)',
+        desc: 'Golem, Lich e Dragão ativam postura enfurecida com ataques devastadores e novos comportamentos de IA ao atingir 50% de HP.',
+        priority: 'high',
+        category: 'Inimigos',
+        column: 'done'
+      },
+      {
+        id: 'task-c6',
+        title: 'Sistema de Forja de Cartas (+) e Fogueiras Táticas',
+        desc: 'Opção de aprimorar qualquer carta do deck para a versão (+) com valores elevados de ataque, defesa ou menor custo.',
+        priority: 'med',
+        category: 'Mecânica',
+        column: 'done'
+      },
+      {
+        id: 'task-c7',
+        title: 'Cinto de 3 Slots de Poções Consumíveis',
+        desc: 'Implementação de 6 poções táticas (Fogo, Veneno, Cura, Mana, Pele de Pedra, Força) utilizáveis em tempo real no combate.',
+        priority: 'med',
+        category: 'Mecânica',
+        column: 'done'
+      },
+      {
+        id: 'task-c8',
+        title: 'Loja do Mercador Renegado & Purificação de Baralho',
+        desc: 'Nós de mercador no mapa vendendo cartas, relíquias exclusivas e opção de purificar o baralho pagando moedas de ouro.',
+        priority: 'med',
+        category: 'Mecânica',
+        column: 'done'
+      },
+      {
+        id: 'task-c9',
+        title: 'Suporte a Controles Físicos (Xbox, DualSense, Switch)',
+        desc: 'Navegação fluida no mapa, arena de combate, seleção de cartas e HUD hints bar dinâmico ao conectar controle USB/Bluetooth.',
+        priority: 'low',
+        category: 'Mobile',
+        column: 'done'
+      }
+    ];
+
+    let tasks = [];
+    let priorityFilter = 'all';
+    let categoryFilter = 'all';
+
+    function initBoard() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          tasks = JSON.parse(saved);
+        } catch (e) {
+          tasks = [...DEFAULT_TASKS];
+        }
+      } else {
+        tasks = [...DEFAULT_TASKS];
+        saveTasks();
+      }
+      renderBoard();
+    }
+
+    function saveTasks() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    }
+
+    function renderBoard() {
+      const cols = ['todo-high', 'todo-med', 'doing', 'done'];
+      const colCounts = { 'todo-high': 0, 'todo-med': 0, 'doing': 0, 'done': 0 };
+
+      cols.forEach(col => {
+        document.getElementById(`col-${col}`).innerHTML = '';
+      });
+
+      tasks.forEach(task => {
+        // Aplica Filtros
+        if (priorityFilter !== 'all' && task.priority !== priorityFilter) return;
+        if (categoryFilter !== 'all' && task.category !== categoryFilter) return;
+
+        colCounts[task.column] = (colCounts[task.column] || 0) + 1;
+
+        const cardEl = document.createElement('div');
+        cardEl.className = 'kanban-card';
+        cardEl.draggable = true;
+        cardEl.id = task.id;
+        cardEl.ondragstart = (e) => handleDragStart(e, task.id);
+        cardEl.ondragend = handleDragEnd;
+
+        const priorityLabel = task.priority === 'high' ? 'Alta' : (task.priority === 'med' ? 'Média' : 'Baixa');
+
+        cardEl.innerHTML = `
+          <div class="card-top">
+            <div class="card-tags">
+              <span class="tag tag-priority-${task.priority}">● ${priorityLabel}</span>
+              <span class="tag tag-category">${task.category || 'Geral'}</span>
+            </div>
+            <div class="card-actions-dropdown">
+              <button class="btn-icon" onclick="moveTask('${task.id}', -1)" title="Mover para esquerda">◀</button>
+              <button class="btn-icon" onclick="moveTask('${task.id}', 1)" title="Mover para direita">▶</button>
+              <button class="btn-icon" onclick="deleteTask('${task.id}')" title="Excluir">✕</button>
+            </div>
+          </div>
+          <div class="card-title">${task.title}</div>
+          <div class="card-desc">${task.desc}</div>
+          <div class="card-footer">
+            <button class="btn-copy-prompt" onclick="copyPromptToChat('${task.id}')" title="Clique para copiar a instrução pronta para colar no chat do Antigravity">
+              📋 Copiar Pedido para o Chat
+            </button>
+          </div>
+        `;
+
+        const targetCol = document.getElementById(`col-${task.column}`);
+        if (targetCol) {
+          targetCol.appendChild(cardEl);
+        }
+      });
+
+      cols.forEach(col => {
+        const badge = document.getElementById(`badge-${col}`);
+        if (badge) badge.innerText = colCounts[col] || 0;
+      });
+    }
+
+    // Copiar Pedido para o Antigravity
+    function copyPromptToChat(taskId) {
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) return;
+
+      const promptText = `Por favor, execute a seguinte tarefa do Roadmap:
+🎯 Título: ${task.title}
+📂 Categoria: ${task.category}
+📝 Descrição detalhada: ${task.desc}`;
+
+      navigator.clipboard.writeText(promptText).then(() => {
+        showToast(`✅ Pedido copiado! Basta colar no chat.`);
+      }).catch(() => {
+        showToast(`Erro ao copiar. Selecione manualmente.`);
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // Drag & Drop
+    let draggedId = null;
+    function handleDragStart(e, id) {
+      draggedId = id;
+      e.target.classList.add('dragging');
+    }
+    function handleDragEnd(e) {
+      e.target.classList.remove('dragging');
+      draggedId = null;
+    }
+    function allowDrop(e) {
+      e.preventDefault();
+    }
+    function handleDrop(e, targetCol) {
+      e.preventDefault();
+      if (!draggedId) return;
+      const task = tasks.find(t => t.id === draggedId);
+      if (task) {
+        task.column = targetCol;
+        saveTasks();
+        renderBoard();
+      }
+    }
+
+    // Mover por setas
+    const COL_ORDER = ['todo-high', 'todo-med', 'doing', 'done'];
+    function moveTask(id, dir) {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+      const curIdx = COL_ORDER.indexOf(task.column);
+      const nextIdx = curIdx + dir;
+      if (nextIdx >= 0 && nextIdx < COL_ORDER.length) {
+        task.column = COL_ORDER[nextIdx];
+        saveTasks();
+        renderBoard();
+      }
+    }
+
+    function deleteTask(id) {
+      if (confirm('Tem certeza que deseja remover esta tarefa do quadro?')) {
+        tasks = tasks.filter(t => t.id !== id);
+        saveTasks();
+        renderBoard();
+      }
+    }
+
+    // Modal Nova Tarefa
+    function openCreateModal() {
+      document.getElementById('create-modal').classList.add('active');
+      document.getElementById('new-title').focus();
+    }
+    function closeCreateModal() {
+      document.getElementById('create-modal').classList.remove('active');
+    }
+    function saveNewTask() {
+      const title = document.getElementById('new-title').value.trim();
+      const desc = document.getElementById('new-desc').value.trim();
+      const priority = document.getElementById('new-priority').value;
+      const category = document.getElementById('new-category').value;
+      const column = document.getElementById('new-col').value;
+
+      if (!title) {
+        alert('Por favor, informe ao menos um título para a tarefa.');
+        return;
+      }
+
+      const newTask = {
+        id: 'task-' + Date.now(),
+        title,
+        desc: desc || 'Sem descrição adicional.',
+        priority,
+        category,
+        column
+      };
+
+      tasks.unshift(newTask);
+      saveTasks();
+      renderBoard();
+      closeCreateModal();
+
+      document.getElementById('new-title').value = '';
+      document.getElementById('new-desc').value = '';
+      showToast('✨ Nova tarefa adicionada ao quadro!');
+    }
+
+    // Filtros
+    function setPriorityFilter(p) {
+      priorityFilter = p;
+      document.querySelectorAll('.filter-group:first-child .filter-pill').forEach(pill => {
+        pill.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      renderBoard();
+    }
+
+    function setCategoryFilter(c) {
+      categoryFilter = c;
+      document.querySelectorAll('.filter-group:last-child .filter-pill').forEach(pill => {
+        pill.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      renderBoard();
+    }
+
+    // Resetar / Exportar
+    function resetDefaultTasks() {
+      if (confirm('Deseja restaurar todas as tarefas originais de exemplo do Roadmap?')) {
+        tasks = [...DEFAULT_TASKS];
+        saveTasks();
+        renderBoard();
+        showToast('Quadro restaurado com sucesso!');
+      }
+    }
+
+    function exportData() {
+      const json = JSON.stringify(tasks, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'cards-e-dungeons-roadmap.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('💾 Arquivo de backup exportado!');
+    }
+
+    window.addEventListener('DOMContentLoaded', initBoard);
+  </script>
+</body>
+</html>

@@ -37,6 +37,7 @@ fs.mkdirSync(outDir, { recursive: true });
 
 // 1. Arquivos base
 fs.copyFileSync(path.join(rootDir, 'index.html'), path.join(outDir, 'index.html'));
+fs.copyFileSync(path.join(rootDir, 'dev-board.html'), path.join(outDir, 'dev-board.html'));
 fs.copyFileSync(path.join(rootDir, 'manifest.json'), path.join(outDir, 'manifest.json'));
 fs.copyFileSync(path.join(rootDir, 'service-worker.js'), path.join(outDir, 'service-worker.js'));
 

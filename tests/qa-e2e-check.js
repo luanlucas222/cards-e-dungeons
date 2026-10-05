@@ -97,6 +97,7 @@ server.listen(4123, '127.0.0.1', async () => {
     '/assets/cards/sword.jpg',
     '/manifest.json',
     '/service-worker.js',
+    '/dev-board.html',
     '/assets/ui/icon-192.png',
     '/assets/ui/icon-512.png',
     '/assets/ui/icon-maskable-192.png',
