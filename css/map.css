@@ -1,0 +1,402 @@
+/* ==========================================================================
+   CARDS E DUNGEONS - Dungeon Path Tree Map Stylesheet (map.css)
+   Mapa de Nós Convergente Roguelike (Estilo Pergaminho Rúnico / Slay the Spire)
+   ========================================================================== */
+
+/* Tela do Mapa */
+.map-screen {
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: 
+    radial-gradient(circle at 50% 20%, rgba(212, 175, 55, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 90%, rgba(179, 27, 44, 0.06) 0%, transparent 60%),
+    linear-gradient(180deg, #090a0e 0%, #12141c 50%, #07080b 100%);
+}
+
+/* Cabeçalho do Mapa */
+.map-header {
+  padding: 18px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(14, 15, 22, 0.7);
+  backdrop-filter: blur(8px);
+  z-index: 10;
+}
+
+.map-title-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.map-title {
+  font-family: var(--font-fantasy);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--gold-light);
+  letter-spacing: 1.5px;
+  text-shadow: 0 0 12px var(--gold-glow);
+}
+
+.map-subtitle {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Área de Rolagem do Mapa */
+.map-viewport {
+  flex: 1;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 40px 20px 60px;
+  position: relative;
+}
+
+/* Estilização da Barra de Rolagem */
+.map-viewport::-webkit-scrollbar {
+  width: 6px;
+}
+.map-viewport::-webkit-scrollbar-track {
+  background: rgba(10, 11, 16, 0.5);
+}
+.map-viewport::-webkit-scrollbar-thumb {
+  background: var(--border-frame);
+  border-radius: 3px;
+}
+.map-viewport::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-dark);
+}
+
+/* Container da Árvore de Caminhos */
+.map-tree-container {
+  width: 100%;
+  max-width: 620px;
+  position: relative;
+  display: flex;
+  flex-direction: column-reverse; /* Andar 1 na base, Boss no topo! */
+  gap: 55px;
+  margin: 0 auto;
+  padding: 30px 20px 90px;
+}
+
+/* Camada SVG para as Trilhas Conectoras */
+.map-connections-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.map-path-line {
+  stroke: rgba(212, 175, 55, 0.45);
+  stroke-width: 3px;
+  stroke-dasharray: 6 6;
+  transition: stroke 0.3s ease, stroke-width 0.3s ease;
+}
+
+.map-path-line.path-active {
+  stroke: var(--gold-primary);
+  stroke-width: 4px;
+  stroke-dasharray: none;
+  filter: drop-shadow(0 0 8px var(--gold-glow));
+}
+
+.map-path-line.path-available,
+.map-path-line.path-connecting-available {
+  stroke: rgba(250, 228, 140, 0.85);
+  stroke-width: 3.5px;
+  filter: drop-shadow(0 0 6px var(--gold-glow));
+  animation: dashMove 1.5s linear infinite;
+}
+
+@keyframes dashMove {
+  from { stroke-dashoffset: 24; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Linha de Andar (Camada de Nós) */
+.map-floor-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.floor-label {
+  position: absolute;
+  left: -40px;
+  font-family: var(--font-fantasy);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Nós do Mapa */
+.map-node {
+  width: clamp(66px, 6.2vw, 76px);
+  height: clamp(66px, 6.2vw, 76px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #242838 0%, #111219 80%);
+  border: 2px solid var(--border-frame);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: default;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), 
+              box-shadow 0.25s ease, 
+              border-color 0.25s ease;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.7);
+}
+
+.node-icon-wrapper {
+  width: 90%;
+  height: 90%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease;
+}
+
+.node-token-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.85));
+}
+
+.node-icon-wrapper svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+}
+
+.node-type-label {
+  position: absolute;
+  bottom: -20px;
+  font-family: var(--font-fantasy);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  white-space: nowrap;
+  letter-spacing: 0.6px;
+  transition: color 0.2s ease;
+}
+
+/* 1. Nó de Combate Comum */
+.map-node.node-combat {
+  border-color: #b31b2c;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7), 0 0 10px rgba(231, 76, 60, 0.3);
+}
+.map-node.node-combat .node-icon-wrapper svg {
+  fill: #ff7675;
+  stroke: #ff7675;
+}
+
+/* 2. Nó de Santuário / Fogueira */
+.map-node.node-shrine,
+.map-node.node-sanctuary {
+  border-color: #27ae60;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7), 0 0 12px rgba(46, 204, 113, 0.35);
+}
+.map-node.node-shrine .node-icon-wrapper svg,
+.map-node.node-sanctuary .node-icon-wrapper svg {
+  fill: #2ecc71;
+  stroke: #2ecc71;
+}
+
+/* 3. Nó de Chefe (Boss) */
+.map-node.node-boss {
+  width: clamp(76px, 7.2vw, 86px);
+  height: clamp(76px, 7.2vw, 86px);
+  border-width: 3px;
+  border-color: var(--gold-primary);
+  background: radial-gradient(circle at 35% 35%, #422810 0%, #171109 80%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 24px var(--gold-glow);
+  animation: bossAuraGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes bossAuraGlow {
+  0% { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 20px var(--gold-glow); }
+  100% { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.95), 0 0 34px rgba(231, 76, 60, 0.65); }
+}
+.map-node.node-boss .node-icon-wrapper {
+  width: 90%;
+  height: 90%;
+}
+.map-node.node-boss .node-icon-wrapper svg {
+  fill: #ffd700;
+  stroke: #ffd700;
+}
+
+/* 4. Nó de Elite (Minotauro Berserker) */
+.map-node.node-elite {
+  border-color: #d35400;
+  background: radial-gradient(circle at 35% 35%, #381a0b 0%, #150a04 80%);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.8), 0 0 16px rgba(230, 126, 34, 0.5);
+}
+.map-node.node-elite .node-icon-wrapper svg {
+  fill: #e67e22;
+  stroke: #e67e22;
+}
+.map-node.node-elite:hover {
+  border-color: #f39c12;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9), 0 0 22px rgba(243, 156, 18, 0.7);
+}
+
+.map-node.node-merchant {
+  border-color: #d4af37;
+  background: radial-gradient(circle at 35% 35%, #3a2e12 0%, #151005 80%);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.8), 0 0 16px rgba(212, 175, 55, 0.45);
+}
+.map-node.node-merchant .node-icon-wrapper svg {
+  fill: #ffd700;
+  stroke: #d4af37;
+}
+.map-node.node-merchant:hover {
+  border-color: #ffe066;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9), 0 0 24px rgba(255, 215, 0, 0.7);
+}
+
+/* 5. Nó de Evento Narrativo Misterioso */
+.map-node.node-event {
+  border-color: #a855f7;
+  background: radial-gradient(circle at 35% 35%, #3b0764 0%, #170426 80%);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.8), 0 0 16px rgba(168, 85, 247, 0.5);
+}
+.map-node.node-event .node-icon-wrapper svg {
+  fill: #c084fc;
+  stroke: #c084fc;
+}
+.map-node.node-event:hover {
+  border-color: #e9d5ff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9), 0 0 24px rgba(192, 132, 252, 0.8);
+}
+
+/* 6. Nó de Sala do Tesouro Ancestral */
+.map-node.node-treasure {
+  border-color: #f59e0b;
+  background: radial-gradient(circle at 35% 35%, #451a03 0%, #1c0b02 80%);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.8), 0 0 18px rgba(245, 158, 11, 0.55);
+}
+.map-node.node-treasure .node-icon-wrapper svg {
+  fill: #fbbf24;
+  stroke: #f59e0b;
+}
+.map-node.node-treasure:hover {
+  border-color: #fde68a;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9), 0 0 26px rgba(251, 191, 36, 0.85);
+}
+
+/* Estados de Nós */
+
+/* A) Nó Disponível (Jogador Pode Escolher Clicar) */
+.map-node.node-available {
+  cursor: pointer;
+  border-color: var(--gold-light);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.8), 0 0 16px var(--gold-glow);
+  animation: remotionNodePulse 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.map-node.node-available:hover {
+  transform: scale(1.18) translateY(-3px);
+  border-color: #ffffff;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.95), 0 0 28px rgba(250, 228, 140, 0.9);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+}
+
+.map-node.node-available:hover .node-type-label {
+  color: var(--gold-light);
+}
+
+@keyframes remotionNodePulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.8), 0 0 14px var(--gold-glow);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.9), 0 0 24px rgba(250, 228, 140, 0.85);
+  }
+}
+
+/* B) Nó Atual (Onde o Jogador Está Agora) */
+.map-node.node-current {
+  border-color: #38ada9;
+  box-shadow: 0 0 20px rgba(56, 173, 169, 0.6);
+}
+
+.map-node.node-current::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px dashed #38ada9;
+  animation: rotateRing 8s linear infinite;
+}
+
+@keyframes rotateRing {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* C) Nó Já Visitado / Concluído */
+.map-node.node-visited {
+  opacity: 0.45;
+  filter: grayscale(0.7);
+  cursor: default;
+}
+
+.map-node.node-visited::before {
+  content: '✓';
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--gold-primary);
+  color: #000;
+  font-size: 0.7rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* D) Nó Bloqueado (Fora de Alcance) */
+.map-node.node-locked {
+  opacity: 0.35;
+  filter: grayscale(1);
+  cursor: not-allowed;
+}
+
+/* Rodapé de Dica do Mapa */
+.map-footer-hint {
+  padding: 12px;
+  text-align: center;
+  font-family: var(--font-fantasy);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}

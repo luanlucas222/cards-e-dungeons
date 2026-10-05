@@ -1,0 +1,427 @@
+/* ==========================================================================
+   CARDS E DUNGEONS - Card Component Stylesheet (cards.css)
+   Design Tátil Físico, Texturas de Placa Metálica & Efeitos Rúnicos
+   ========================================================================== */
+
+/* Cartão Base */
+.game-card {
+  width: var(--card-w);
+  height: var(--card-h);
+  position: relative;
+  border-radius: 10px;
+  background: linear-gradient(165deg, #232738 0%, #151722 60%, #0d0e15 100%);
+  border: 2px solid var(--border-frame);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  box-sizing: border-box;
+  transform-origin: center bottom;
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), 
+              box-shadow 0.22s ease, 
+              border-color 0.22s ease,
+              filter 0.25s ease;
+  will-change: transform, box-shadow;
+  user-select: none;
+}
+
+/* Moldura Interna de Filigrana Metálica */
+.game-card::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+/* 1. Ataque (Carmesim Belicoso) */
+.game-card.card-attack {
+  border-color: #a82e3b;
+  background: 
+    radial-gradient(circle at 50% 25%, rgba(231, 76, 60, 0.25) 0%, transparent 70%),
+    linear-gradient(165deg, #2c1619 0%, #190e10 70%, #0c0708 100%);
+}
+.game-card.card-attack:hover {
+  border-color: var(--crimson-light);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85), 0 0 22px var(--crimson-glow);
+}
+
+/* 2. Defesa (Safira Protetora) */
+.game-card.card-defense {
+  border-color: #256bb8;
+  background: 
+    radial-gradient(circle at 50% 25%, rgba(58, 145, 252, 0.25) 0%, transparent 70%),
+    linear-gradient(165deg, #162438 0%, #0e1724 70%, #080d14 100%);
+}
+.game-card.card-defense:hover {
+  border-color: var(--sapphire-light);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85), 0 0 22px var(--sapphire-glow);
+}
+
+/* 3. Especial / Habilidade (Ouro e Esmeralda Arcano) */
+.game-card.card-skill,
+.game-card.card-special {
+  border-color: #b08d2b;
+  background: 
+    radial-gradient(circle at 50% 25%, rgba(212, 175, 55, 0.25) 0%, transparent 70%),
+    linear-gradient(165deg, #2e2617 0%, #1c170d 70%, #0e0b06 100%);
+}
+.game-card.card-skill:hover,
+.game-card.card-special:hover {
+  border-color: var(--gold-light);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85), 0 0 24px var(--gold-glow);
+}
+
+/* ==========================================================================
+   MOLDURAS POR RARIDADE DE CARTA (SPRINT 1)
+   ========================================================================== */
+
+/* 1. Comum (Ferro Escovado) */
+.game-card.card-common {
+  border-color: #555c6d;
+}
+.game-card.card-common::after {
+  border-color: rgba(200, 210, 230, 0.1);
+}
+
+/* 2. Incomum (Bronze Rúnico) */
+.game-card.card-uncommon {
+  border-color: #b87333;
+  box-shadow: var(--shadow-card), 0 0 10px rgba(184, 115, 51, 0.25);
+}
+.game-card.card-uncommon::after {
+  border-color: rgba(220, 145, 75, 0.22);
+}
+.game-card.card-uncommon:hover {
+  border-color: #e59866;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85), 0 0 20px rgba(220, 145, 75, 0.45);
+}
+
+/* 3. Rara (Prata Pura com Brilho de Safira) */
+.game-card.card-rare {
+  border-color: #cbd5e1;
+  box-shadow: var(--shadow-card), 0 0 14px rgba(56, 189, 248, 0.35);
+}
+.game-card.card-rare::after {
+  border-color: rgba(56, 189, 248, 0.3);
+}
+.game-card.card-rare:hover {
+  border-color: #ffffff;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.9), 0 0 26px rgba(56, 189, 248, 0.6);
+}
+
+/* 4. Lendária (Ouro Nobre, Gema Lapidada e Shimmer de Brilho) */
+.game-card.card-legendary {
+  border-color: var(--gold-light);
+  border-width: 2.5px;
+  box-shadow: var(--shadow-card), 0 0 20px rgba(212, 175, 55, 0.5), inset 0 0 12px rgba(212, 175, 55, 0.2);
+  position: relative;
+}
+.game-card.card-legendary::after {
+  border-color: rgba(250, 228, 140, 0.45);
+}
+
+/* Gema Lapidada Cintilante */
+.game-card.card-legendary::before {
+  content: '♦';
+  position: absolute;
+  bottom: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 16px;
+  background: radial-gradient(circle, #fde047 0%, #ca8a04 70%, #713f12 100%);
+  border: 1.5px solid #fef08a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: #ffffff;
+  z-index: 15;
+  box-shadow: 0 0 10px #fde047;
+}
+
+/* Shimmer Místico Lendário no Hover */
+.game-card.card-legendary:hover {
+  border-color: #ffffff;
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.92), 0 0 32px var(--gold-glow);
+  animation: legendaryShimmer 2.4s infinite ease-in-out;
+}
+
+@keyframes legendaryShimmer {
+  0%, 100% {
+    filter: brightness(1) drop-shadow(0 0 6px var(--gold-glow));
+  }
+  50% {
+    filter: brightness(1.18) drop-shadow(0 0 18px rgba(254, 240, 138, 0.85));
+  }
+}
+
+
+/* Gema de Custo de Energia (Superior Esquerda) */
+.card-cost {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  width: clamp(26px, 2.8vw, 32px);
+  height: clamp(26px, 2.8vw, 32px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #74b9ff 0%, #0984e3 65%, #08295e 100%);
+  border: 2px solid #dff9fb;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-fantasy);
+  font-weight: 900;
+  font-size: clamp(0.9rem, 1.1vw, 1.15rem);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8), 0 0 14px var(--sapphire-glow);
+  z-index: 10;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+/* Cabeçalho da Carta (Título) */
+.card-header {
+  padding-left: 20px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 3px;
+}
+
+.card-title {
+  font-family: var(--font-fantasy);
+  font-size: clamp(0.66rem, 0.82vw, 0.80rem);
+  font-weight: 800;
+  color: var(--text-gold);
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Moldura da Ilustração Artística */
+.card-art-frame {
+  flex: 1;
+  width: 100%;
+  min-height: clamp(52px, 7vh, 80px);
+  max-height: clamp(68px, 9vh, 98px);
+  border-radius: 6px;
+  background: radial-gradient(circle at center, rgba(32, 36, 52, 0.95) 0%, rgba(12, 14, 20, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.8);
+}
+
+.card-art-frame svg {
+  width: clamp(38px, 4.8vw, 58px);
+  height: clamp(38px, 4.8vw, 58px);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.9));
+  transition: transform 0.25s ease;
+}
+
+.card-art-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.game-card:hover .card-art-img {
+  transform: scale(1.08);
+  filter: brightness(1.15);
+}
+
+.game-card:hover .card-art-frame svg {
+  transform: scale(1.12);
+}
+
+/* Faixa de Tipo da Carta */
+.card-type-banner {
+  height: 20px;
+  margin: 5px 0;
+  border-radius: 3px;
+  background: rgba(10, 11, 16, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.card-type-label {
+  font-family: var(--font-fantasy);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.card-attack .card-type-label { color: #ff7675; }
+.card-defense .card-type-label { color: #74b9ff; }
+.card-skill .card-type-label,
+.card-special .card-type-label { color: var(--gold-light); }
+
+/* Caixa de Descrição / Texto de Efeito */
+.card-body {
+  flex: 1 1 auto;
+  min-height: 60px;
+  max-height: 84px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(14, 16, 24, 0.96) 0%, rgba(8, 9, 14, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.85), 0 2px 6px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+}
+
+.card-description {
+  font-family: var(--font-ui);
+  font-size: clamp(0.68rem, 0.78vw, 0.76rem);
+  line-height: 1.25;
+  color: #f8fafc;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  width: 100%;
+}
+
+/* Destaque Numérico Colorido no Texto */
+.stat-val {
+  font-weight: 800;
+}
+
+.stat-damage {
+  color: #ff7675;
+  text-shadow: 0 0 6px rgba(231, 76, 60, 0.5);
+}
+
+.stat-block {
+  color: #74b9ff;
+  text-shadow: 0 0 6px rgba(58, 145, 252, 0.5);
+}
+
+.stat-heal {
+  color: #55efc4;
+  text-shadow: 0 0 6px rgba(46, 204, 113, 0.5);
+}
+
+.stat-special {
+  color: var(--gold-light);
+  text-shadow: 0 0 6px var(--gold-glow);
+}
+
+.stat-poison {
+  color: #2ecc71;
+  text-shadow: 0 0 6px rgba(46, 204, 113, 0.5);
+}
+
+/* Estado Desabilitado (Sem Mana / Não Jogável) */
+.game-card.disabled {
+  filter: grayscale(0.7) brightness(0.65);
+  cursor: not-allowed;
+  border-color: #383c50 !important;
+  box-shadow: none !important;
+}
+.game-card.disabled:hover {
+  transform: none !important;
+}
+
+/* Animações Táteis */
+.game-card.anim-play {
+  animation: cardPlay 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes cardPlay {
+  0% { transform: translateY(0) scale(1.1); opacity: 1; }
+  100% { transform: translateY(-160px) scale(0.65); opacity: 0; }
+}
+
+.game-card.anim-shake {
+  animation: cardShake 0.3s ease;
+}
+
+@keyframes cardShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+/* ==========================================================================
+   CARTAS APRIMORADAS (+) (FASE 4 - FORJA & ACAMPAMENTO)
+   ========================================================================== */
+.game-card.is-upgraded {
+  border-color: #ffd700;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 16px rgba(255, 215, 0, 0.35);
+}
+
+.game-card.is-upgraded::after {
+  border-color: rgba(255, 215, 0, 0.35);
+  box-shadow: inset 0 0 8px rgba(255, 215, 0, 0.2);
+}
+
+.game-card.is-upgraded .upgraded-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 5px;
+  color: #ffd700;
+  font-family: var(--font-fantasy);
+  font-weight: 900;
+  font-size: 1.15em;
+  text-shadow: 0 0 8px #ffd700, 0 0 14px rgba(255, 215, 0, 0.8);
+  animation: pulseGoldBadge 2.2s infinite ease-in-out;
+}
+
+@keyframes pulseGoldBadge {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 3px #ffd700);
+  }
+  50% {
+    transform: scale(1.22);
+    filter: drop-shadow(0 0 8px #ffffff);
+  }
+}
+
+.game-card.is-upgraded .stat-val {
+  color: #4ade80 !important;
+  text-shadow: 0 0 8px rgba(74, 222, 128, 0.65), 0 0 12px rgba(255, 215, 0, 0.5) !important;
+  font-weight: 900;
+}
+
+/* Animação de Forja */
+.anim-forge-flash {
+  animation: forgeFlash 0.75s ease-out;
+}
+
+@keyframes forgeFlash {
+  0% { transform: scale(0.95); filter: brightness(2.2) drop-shadow(0 0 25px #ffd700); }
+  50% { transform: scale(1.05); filter: brightness(1.6) drop-shadow(0 0 16px #fae48c); }
+  100% { transform: scale(1); filter: none; }
+}

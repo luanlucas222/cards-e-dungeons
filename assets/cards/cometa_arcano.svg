@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <radialGradient id="cometBg" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="55%" stop-color="#0f0e26"/>
+      <stop offset="100%" stop-color="#04030a"/>
+    </radialGradient>
+    <linearGradient id="tailGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" stop-opacity="0.1"/>
+      <stop offset="35%" stop-color="#2563eb"/>
+      <stop offset="70%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+    <radialGradient id="meteorCore" cx="40%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="35%" stop-color="#bae6fd"/>
+      <stop offset="70%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#1e3a8a"/>
+    </radialGradient>
+    <filter id="cometGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="400" fill="url(#cometBg)"/>
+
+  <!-- Distant Cosmic Stars & Nebulae -->
+  <circle cx="50" cy="80" r="1.5" fill="#ffffff" opacity="0.8"/>
+  <circle cx="120" cy="40" r="2" fill="#bae6fd" opacity="0.7"/>
+  <circle cx="340" cy="60" r="1.5" fill="#ffffff" opacity="0.6"/>
+  <circle cx="370" cy="180" r="2" fill="#7dd3fc" opacity="0.7"/>
+  <circle cx="80" cy="340" r="1.5" fill="#ffffff" opacity="0.8"/>
+
+  <!-- Colossal Incandescent Blazing Comet Tail -->
+  <!-- Broad outer plasma tail -->
+  <path d="M 60 40 Q 150 170 280 290 Q 230 330 140 250 Q 50 140 60 40 Z" fill="url(#tailGrad)" opacity="0.35" filter="url(#cometGlow)"/>
+  <!-- Bright core tail flame -->
+  <path d="M 90 60 Q 170 170 270 270 Q 240 295 160 230 Q 80 140 90 60 Z" fill="#38bdf8" opacity="0.65" filter="url(#cometGlow)"/>
+  <!-- Central white-hot plasma streak -->
+  <path d="M 120 80 L 260 250" stroke="#ffffff" stroke-width="8" stroke-linecap="round" filter="url(#cometGlow)"/>
+
+  <!-- Shockwave Rings radiating ahead of the Comet -->
+  <ellipse cx="270" cy="270" rx="75" ry="32" stroke="#38bdf8" stroke-width="2.5" fill="none" transform="rotate(-45 270 270)" opacity="0.75" filter="url(#cometGlow)"/>
+  <ellipse cx="295" cy="295" rx="50" ry="22" stroke="#ffffff" stroke-width="3" fill="none" transform="rotate(-45 295 295)" opacity="0.9"/>
+  <ellipse cx="320" cy="320" rx="30" ry="14" stroke="#e0f2fe" stroke-width="2" fill="none" transform="rotate(-45 320 320)" opacity="0.6"/>
+
+  <!-- Burning Comet Nucleus / Meteor Boulder -->
+  <g transform="translate(260, 260)">
+    <!-- Molten Core -->
+    <circle cx="0" cy="0" r="42" fill="url(#meteorCore)" filter="url(#cometGlow)"/>
+    <!-- Molten Magma / Arcane Cracks -->
+    <path d="M -22 -15 Q 0 -5 18 -20 M -12 10 Q 5 5 20 18 M -5 -25 L -8 15" stroke="#ffffff" stroke-width="2.5" fill="none"/>
+    <circle cx="4" cy="-4" r="16" fill="#ffffff" filter="url(#cometGlow)"/>
+  </g>
+
+  <!-- High-Speed Cosmic Embers & Sparks -->
+  <circle cx="210" cy="180" r="3.5" fill="#ffffff" filter="url(#cometGlow)"/>
+  <circle cx="170" cy="140" r="4" fill="#38bdf8" filter="url(#cometGlow)"/>
+  <circle cx="240" cy="150" r="3" fill="#bae6fd"/>
+  <circle cx="140" cy="100" r="2.5" fill="#ffffff"/>
+  <circle cx="310" cy="220" r="4.5" fill="#7dd3fc" filter="url(#cometGlow)"/>
+  <circle cx="200" cy="240" r="3.5" fill="#38bdf8"/>
+  <circle cx="340" cy="310" r="3" fill="#ffffff"/>
+</svg>

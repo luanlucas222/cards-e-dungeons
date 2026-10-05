@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <radialGradient id="fireBg" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#451a03"/>
+      <stop offset="55%" stop-color="#1c0a02"/>
+      <stop offset="100%" stop-color="#0a0301"/>
+    </radialGradient>
+    <radialGradient id="sparkCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="25%" stop-color="#fef08a"/>
+      <stop offset="55%" stop-color="#f97316"/>
+      <stop offset="85%" stop-color="#ea580c"/>
+      <stop offset="100%" stop-color="#7c2d12"/>
+    </radialGradient>
+    <filter id="flameGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="400" fill="url(#fireBg)"/>
+
+  <!-- Runic Concentric Spell Circles -->
+  <circle cx="200" cy="200" r="140" stroke="#ea580c" stroke-width="1.5" stroke-dasharray="12 8" fill="none" opacity="0.4" filter="url(#flameGlow)"/>
+  <circle cx="200" cy="200" r="105" stroke="#f97316" stroke-width="2" stroke-dasharray="24 12" fill="none" opacity="0.6"/>
+  <circle cx="200" cy="200" r="75" stroke="#fde047" stroke-width="1.8" stroke-dasharray="6 6" fill="none" opacity="0.8"/>
+
+  <!-- Swirling Flame Spirals -->
+  <path d="M 120 280 C 140 220 180 230 200 180 C 220 130 180 110 210 70" stroke="#f97316" stroke-width="8" stroke-linecap="round" fill="none" opacity="0.75" filter="url(#flameGlow)"/>
+  <path d="M 280 280 C 250 210 220 230 200 180 C 180 130 220 110 190 70" stroke="#fbbf24" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.85" filter="url(#flameGlow)"/>
+  <path d="M 150 140 Q 200 100 250 140 Q 200 180 150 140 Z" fill="#ea580c" opacity="0.45" filter="url(#flameGlow)"/>
+
+  <!-- Central Fire Spark / Flame Orb -->
+  <circle cx="200" cy="180" r="55" fill="url(#sparkCore)" filter="url(#flameGlow)"/>
+  <circle cx="200" cy="180" r="32" fill="#ffffff" filter="url(#flameGlow)"/>
+
+  <!-- Wizard Fingertips Channeling from Bottom -->
+  <g transform="translate(200, 310)">
+    <!-- Palm / Fingers Silhouette -->
+    <path d="M -70 80 C -60 20 -40 -10 -25 -25 C -20 -15 -15 20 -10 60" stroke="#78350f" stroke-width="14" stroke-linecap="round" fill="none"/>
+    <path d="M -25 -25 C -15 -45 5 -45 15 -25" stroke="#d97706" stroke-width="6" stroke-linecap="round" fill="none" filter="url(#flameGlow)"/>
+    <path d="M 70 80 C 60 20 40 -10 25 -25 C 20 -15 15 20 10 60" stroke="#78350f" stroke-width="14" stroke-linecap="round" fill="none"/>
+    <!-- Energy Beams leaping from fingertips to orb -->
+    <path d="M -20 -30 Q -10 -70 0 -95" stroke="#fef08a" stroke-width="3" stroke-linecap="round" fill="none" filter="url(#flameGlow)"/>
+    <path d="M 20 -30 Q 10 -70 0 -95" stroke="#fef08a" stroke-width="3" stroke-linecap="round" fill="none" filter="url(#flameGlow)"/>
+  </g>
+
+  <!-- Bright Embers and Sparks Flying -->
+  <g fill="#fde047" filter="url(#flameGlow)">
+    <circle cx="160" cy="110" r="3.5"/>
+    <circle cx="240" cy="120" r="4"/>
+    <circle cx="130" cy="190" r="3"/>
+    <circle cx="270" cy="170" r="4.5"/>
+    <circle cx="210" cy="80" r="3"/>
+    <circle cx="185" cy="60" r="2.5"/>
+    <circle cx="225" cy="240" r="3.5"/>
+  </g>
+  <circle cx="200" cy="180" r="6" fill="#ffffff"/>
+</svg>

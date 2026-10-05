@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <radialGradient id="barrierBg" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="55%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </radialGradient>
+    <radialGradient id="hexFill" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.4"/>
+      <stop offset="70%" stop-color="#1d4ed8" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#1e1b4b" stop-opacity="0.1"/>
+    </radialGradient>
+    <filter id="manaGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="400" fill="url(#barrierBg)"/>
+
+  <!-- Energy Wave Expanding from Center -->
+  <circle cx="200" cy="200" r="170" stroke="#3b82f6" stroke-width="2" fill="none" opacity="0.3" filter="url(#manaGlow)"/>
+  <circle cx="200" cy="200" r="145" stroke="#60a5fa" stroke-width="2.5" fill="none" opacity="0.5"/>
+
+  <!-- Hexagonal Grid Barrier Matrix -->
+  <!-- Center Hexagon -->
+  <polygon points="200,140 252,170 252,230 200,260 148,230 148,170" fill="url(#hexFill)" stroke="#60a5fa" stroke-width="3" filter="url(#manaGlow)"/>
+
+  <!-- Surrounding Hexagons -->
+  <!-- Top -->
+  <polygon points="200,60 252,90 252,150 200,180 148,150 148,90" fill="url(#hexFill)" stroke="#3b82f6" stroke-width="2" opacity="0.8"/>
+  <!-- Bottom -->
+  <polygon points="200,220 252,250 252,310 200,340 148,310 148,250" fill="url(#hexFill)" stroke="#3b82f6" stroke-width="2" opacity="0.8"/>
+  <!-- Top-Right -->
+  <polygon points="268,100 320,130 320,190 268,220 216,190 216,130" fill="url(#hexFill)" stroke="#38bdf8" stroke-width="2" opacity="0.85"/>
+  <!-- Bottom-Right -->
+  <polygon points="268,180 320,210 320,270 268,300 216,270 216,210" fill="url(#hexFill)" stroke="#38bdf8" stroke-width="2" opacity="0.85"/>
+  <!-- Top-Left -->
+  <polygon points="132,100 184,130 184,190 132,220 80,190 80,130" fill="url(#hexFill)" stroke="#38bdf8" stroke-width="2" opacity="0.85"/>
+  <!-- Bottom-Left -->
+  <polygon points="132,180 184,210 184,270 132,300 80,270 80,210" fill="url(#hexFill)" stroke="#38bdf8" stroke-width="2" opacity="0.85"/>
+
+  <!-- Ancient Arcane Sigil in Center -->
+  <polygon points="200,165 230,218 170,218" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.9" filter="url(#manaGlow)"/>
+  <polygon points="200,235 230,182 170,182" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.9" filter="url(#manaGlow)"/>
+  <circle cx="200" cy="200" r="14" fill="#38bdf8" filter="url(#manaGlow)"/>
+  <circle cx="200" cy="200" r="7" fill="#ffffff"/>
+
+  <!-- Blocked Impact Sparks on outer edge -->
+  <path d="M 320 160 L 335 150 M 325 180 L 345 185 M 330 200 L 350 215" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="325" cy="180" r="3" fill="#f87171"/>
+
+  <!-- Mana Sparkles orbiting the barrier -->
+  <circle cx="150" cy="130" r="3" fill="#93c5fd" filter="url(#manaGlow)"/>
+  <circle cx="250" cy="130" r="3" fill="#93c5fd" filter="url(#manaGlow)"/>
+  <circle cx="290" cy="240" r="2.5" fill="#60a5fa"/>
+  <circle cx="110" cy="240" r="2.5" fill="#60a5fa"/>
+  <circle cx="200" cy="90" r="3.5" fill="#ffffff" filter="url(#manaGlow)"/>
+  <circle cx="200" cy="310" r="3.5" fill="#ffffff" filter="url(#manaGlow)"/>
+</svg>

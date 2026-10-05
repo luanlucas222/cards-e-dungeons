@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <radialGradient id="tomeBg" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#2e1065"/>
+      <stop offset="55%" stop-color="#170638"/>
+      <stop offset="100%" stop-color="#070212"/>
+    </radialGradient>
+    <linearGradient id="bookCover" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#581c87"/>
+      <stop offset="50%" stop-color="#3b0764"/>
+      <stop offset="100%" stop-color="#1e0538"/>
+    </linearGradient>
+    <linearGradient id="pageGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="50%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#fef08a"/>
+    </linearGradient>
+    <filter id="runeGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="400" fill="url(#tomeBg)"/>
+
+  <!-- Orbiting Celestial Mana Rings -->
+  <ellipse cx="200" cy="200" rx="160" ry="60" stroke="#a855f7" stroke-width="1.5" fill="none" transform="rotate(-25 200 200)" opacity="0.4" filter="url(#runeGlow)"/>
+  <ellipse cx="200" cy="200" rx="140" ry="45" stroke="#38bdf8" stroke-width="2" stroke-dasharray="16 8" fill="none" transform="rotate(20 200 200)" opacity="0.6"/>
+
+  <!-- Orbiting Glowing Mana Orbs -->
+  <circle cx="90" cy="150" r="10" fill="#38bdf8" filter="url(#runeGlow)"/>
+  <circle cx="90" cy="150" r="4" fill="#ffffff"/>
+  <circle cx="310" cy="230" r="12" fill="#c084fc" filter="url(#runeGlow)"/>
+  <circle cx="310" cy="230" r="5" fill="#ffffff"/>
+  <circle cx="270" cy="110" r="8" fill="#fde047" filter="url(#runeGlow)"/>
+  <circle cx="270" cy="110" r="3" fill="#ffffff"/>
+
+  <!-- Levitating Arcane Grimoire / Spellbook -->
+  <g transform="translate(200, 205)">
+    <!-- Book Shadow below -->
+    <ellipse cx="0" cy="100" rx="80" ry="18" fill="#000000" opacity="0.5"/>
+
+    <!-- Left Book Cover -->
+    <path d="M 0 45 L -105 15 C -95 -30 -60 -45 0 -40 Z" fill="url(#bookCover)" stroke="#c084fc" stroke-width="2"/>
+    <!-- Right Book Cover -->
+    <path d="M 0 45 L 105 15 C 95 -30 60 -45 0 -40 Z" fill="url(#bookCover)" stroke="#c084fc" stroke-width="2"/>
+
+    <!-- Left Glowing Pages -->
+    <path d="M 0 35 L -95 10 C -85 -25 -55 -40 0 -35 Z" fill="#fdf4ff" stroke="#e9d5ff" stroke-width="1"/>
+    <!-- Right Glowing Pages -->
+    <path d="M 0 35 L 95 10 C 85 -25 55 -40 0 -35 Z" fill="#fdf4ff" stroke="#e9d5ff" stroke-width="1"/>
+
+    <!-- Book Spine / Center Binding -->
+    <path d="M -4 -38 L 4 -38 L 4 44 L -4 44 Z" fill="#fde047"/>
+
+    <!-- Luminous Runic Text on Pages -->
+    <g stroke="#9333ea" stroke-width="2" stroke-linecap="round" opacity="0.85">
+      <!-- Left Page Runes -->
+      <line x1="-70" y1="-15" x2="-20" y2="-15"/>
+      <line x1="-65" y1="-3" x2="-25" y2="-3"/>
+      <line x1="-75" y1="10" x2="-20" y2="10"/>
+      <line x1="-60" y1="22" x2="-30" y2="22"/>
+
+      <!-- Right Page Runes -->
+      <line x1="20" y1="-15" x2="70" y2="-15"/>
+      <line x1="25" y1="-3" x2="65" y2="-3"/>
+      <line x1="20" y1="10" x2="75" y2="10"/>
+      <line x1="30" y1="22" x2="60" y2="22"/>
+    </g>
+
+    <!-- Magic Light Rising from Open Book Spine -->
+    <path d="M 0 -35 L -25 -110 Q 0 -130 25 -110 Z" fill="url(#pageGlow)" opacity="0.75" filter="url(#runeGlow)"/>
+    <circle cx="0" cy="-115" r="8" fill="#ffffff" filter="url(#runeGlow)"/>
+  </g>
+
+  <!-- Floating Arcane Glyphs / Runes in the Air -->
+  <g fill="#c084fc" opacity="0.8" filter="url(#runeGlow)" font-family="serif" font-size="20">
+    <text x="140" y="90">᚛</text>
+    <text x="245" y="85">ᚱ</text>
+    <text x="188" y="65">ᛟ</text>
+  </g>
+
+  <!-- Stardust and Sparkles -->
+  <circle cx="160" cy="140" r="2.5" fill="#ffffff"/>
+  <circle cx="230" cy="150" r="3" fill="#ffffff"/>
+  <circle cx="190" cy="310" r="2" fill="#a855f7"/>
+  <circle cx="215" cy="320" r="2" fill="#38bdf8"/>
+</svg>

@@ -1,0 +1,964 @@
+/* ==========================================================================
+   CARDS E DUNGEONS - Combat Arena Stylesheet (combat.css)
+   Arena de Batalha, Entidades (Herói & Monstros), Mão em Leque & FX
+   ========================================================================== */
+
+/* Arena Geral de Batalha */
+.combat-screen {
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Indicador de Rodada / Turno no Topo */
+.combat-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 30px;
+  z-index: 10;
+}
+
+.encounter-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.encounter-title {
+  font-family: var(--font-fantasy);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--gold-light);
+  text-shadow: 0 0 10px var(--gold-glow);
+}
+
+.turn-counter-badge {
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid var(--gold-primary);
+  color: var(--text-gold);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-round);
+}
+
+/* Palco Central dos Combatentes (Herói vs Inimigo) */
+.combat-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: clamp(16px, 2.5vh, 28px) clamp(8px, 2vw, 36px);
+  position: relative;
+  max-width: 100%;
+  margin: 0 auto;
+  width: 100%;
+  background: transparent;
+}
+
+/* Canvas 2D de Efeitos Visuais Cinematográficos (Combat FX) */
+.combat-fx-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 35;
+}
+
+/* Painel de Combatente (Base) */
+.combatant {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  width: clamp(130px, 22vw, 240px);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+/* Pedestal Rúnico de Chão sob os Combatentes (Aterramento com sombra e luz de tocha) */
+.combatant::after {
+  content: '';
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(140px, 20vw, 220px);
+  height: 24px;
+  background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.35) 0%, rgba(16, 18, 26, 0.7) 45%, transparent 75%);
+  border-radius: 50%;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.95), 0 0 16px rgba(212, 175, 55, 0.25);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.hero-combatant::after {
+  background: radial-gradient(ellipse at center, rgba(58, 145, 252, 0.4) 0%, rgba(16, 24, 38, 0.7) 50%, transparent 75%);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.95), 0 0 18px var(--sapphire-glow);
+}
+
+.enemy-combatant::after {
+  background: radial-gradient(ellipse at center, rgba(231, 76, 60, 0.45) 0%, rgba(28, 14, 16, 0.7) 50%, transparent 75%);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.95), 0 0 18px var(--crimson-glow);
+}
+
+.enemy-combatant.is-boss::after {
+  width: clamp(180px, 26vw, 300px);
+  height: 30px;
+  background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.5) 0%, rgba(231, 76, 60, 0.45) 40%, transparent 80%);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.95), 0 0 26px var(--gold-glow);
+}
+
+/* 1. Lado do Herói */
+.combatant.hero-combatant {
+  align-items: center;
+}
+
+.combatant-avatar-frame {
+  width: clamp(96px, 15vw, 165px);
+  height: clamp(96px, 15vw, 165px);
+  border-radius: 50%;
+  position: relative;
+  background: radial-gradient(circle at 40% 40%, #252b3d 0%, #12141c 100%);
+  border: 3px solid var(--border-frame);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.8), 0 0 15px rgba(37, 116, 212, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: clamp(6px, 1.2vh, 12px);
+  overflow: hidden;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hero-combatant .combatant-avatar-frame {
+  border-color: #3a91fc;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px var(--sapphire-glow);
+}
+
+.combatant-avatar-frame svg {
+  width: 78%;
+  height: 78%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.8));
+}
+
+.avatar-portrait-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.combatant-avatar-frame:hover .avatar-portrait-img {
+  transform: scale(1.06);
+  filter: brightness(1.1);
+}
+
+/* 2. Lado do Inimigo */
+.combatant.enemy-combatant {
+  align-items: center;
+}
+
+.enemy-combatant .combatant-avatar-frame {
+  border-color: #e74c3c;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px var(--crimson-glow);
+}
+
+/* Destaque para o Chefe Dragão */
+.enemy-combatant.is-boss .combatant-avatar-frame {
+  width: clamp(130px, 21vw, 220px);
+  height: clamp(130px, 21vw, 220px);
+  border-color: var(--gold-primary);
+  box-shadow: 
+    0 16px 40px rgba(0, 0, 0, 0.9), 
+    0 0 35px rgba(231, 76, 60, 0.6),
+    0 0 15px var(--gold-glow);
+  animation: dragonPulse 3.5s infinite ease-in-out;
+}
+
+.enemy-combatant.is-boss .combatant-avatar-frame svg {
+  width: 190px;
+  height: 190px;
+}
+
+/* Animações de Respiração Ociosa (Idle) dos Combatentes (Sprint 1) */
+.hero-combatant .combatant-avatar-frame {
+  animation: heroIdle 4.2s ease-in-out infinite;
+}
+
+@keyframes heroIdle {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-3px) scale(1.015);
+  }
+}
+
+.enemy-combatant:not(.is-boss):not(.is-specter) .combatant-avatar-frame {
+  animation: monsterIdle 3.8s ease-in-out infinite;
+}
+
+@keyframes monsterIdle {
+  0%, 100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  50% {
+    transform: translateY(3px) scale(1.03, 0.97);
+  }
+}
+
+.enemy-combatant.is-specter .combatant-avatar-frame {
+  animation: ghostHover 3.2s ease-in-out infinite;
+}
+
+@keyframes ghostHover {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+    filter: drop-shadow(0 0 10px rgba(6, 182, 212, 0.4));
+  }
+  50% {
+    transform: translateY(-9px) rotate(1.8deg);
+    filter: drop-shadow(0 0 22px rgba(34, 211, 238, 0.85));
+  }
+}
+
+@keyframes dragonPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(231, 76, 60, 0.5);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.9), 0 0 45px rgba(231, 76, 60, 0.8), 0 0 20px var(--gold-glow);
+  }
+}
+
+/* Placa Gótica Rúnica de Intenção de Guerra do Inimigo */
+.enemy-intent-bubble {
+  position: absolute;
+  top: clamp(-42px, -5vh, -28px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, rgba(32, 35, 50, 0.98) 0%, rgba(18, 20, 30, 0.98) 50%, rgba(10, 11, 16, 0.98) 100%);
+  border: 2px solid var(--border-gold, #c99e32);
+  outline: 1.5px solid rgba(179, 27, 44, 0.6);
+  outline-offset: -3.5px;
+  border-radius: 6px;
+  padding: clamp(4px, 0.6vh, 7px) clamp(10px, 1.3vw, 16px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.9), 0 0 14px var(--crimson-glow);
+  z-index: 25;
+  animation: threatWarningPulse 2.4s ease-in-out infinite;
+  white-space: nowrap;
+}
+
+@keyframes threatWarningPulse {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0) scale(1);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.9), 0 0 12px var(--crimson-glow);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-4px) scale(1.05);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.95), 0 0 22px rgba(231, 76, 60, 0.85);
+  }
+}
+
+.intent-icon {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+}
+
+.intent-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.intent-value {
+  font-family: var(--font-fantasy);
+  font-weight: 900;
+  font-size: 1.15rem;
+  color: #ff5252;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(255, 82, 82, 0.6);
+  letter-spacing: 0.5px;
+}
+
+.intent-label {
+  font-family: var(--font-fantasy);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* Informações de Status dos Combatentes */
+.combatant-info {
+  width: 100%;
+  max-width: 210px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.combatant-name {
+  font-family: var(--font-fantasy);
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.8px;
+  color: var(--text-main);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.enemy-combatant.is-boss .combatant-name {
+  color: var(--gold-light);
+  font-size: 1.25rem;
+}
+
+/* Badge de Afixo Especial do Inimigo / Elite (Fase 3) */
+.enemy-affix-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: linear-gradient(135deg, rgba(234, 88, 12, 0.3) 0%, rgba(180, 83, 9, 0.45) 100%);
+  border: 1.5px solid #f59e0b;
+  color: #fef3c7;
+  font-family: var(--font-fantasy);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: var(--radius-round);
+  margin: 0 auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 10px rgba(245, 158, 11, 0.4);
+  animation: affixGlow 2.5s infinite ease-in-out;
+  cursor: help;
+}
+
+@keyframes affixGlow {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 8px rgba(245, 158, 11, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8), 0 0 16px rgba(245, 158, 11, 0.7);
+  }
+}
+
+/* Barra de Vida & Armadura */
+.hp-bar-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.hp-bar {
+  width: 100%;
+  height: 18px;
+  background: rgba(15, 17, 24, 0.85);
+  border-radius: var(--radius-round);
+  border: 1.5px solid var(--border-frame);
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.9);
+}
+
+.hp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #991420 0%, #e74c3c 100%);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px rgba(231, 76, 60, 0.6);
+}
+
+.hp-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+  pointer-events: none;
+}
+
+/* Escudo / Armadura Badge */
+.armor-badge {
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: radial-gradient(circle, #2574d4 0%, #103460 100%);
+  border: 1.5px solid #74b9ff;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-family: var(--font-fantasy);
+  font-size: 0.85rem;
+  font-weight: 900;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), 0 0 10px var(--sapphire-glow);
+  z-index: 3;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.armor-badge.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(-50%) scale(1);
+}
+
+/* Orbes de Mana / Energia do Jogador */
+.energy-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.energy-orbs-group {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  align-items: center;
+}
+
+.energy-orb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #74b9ff 0%, #0984e3 60%, #0c2461 100%);
+  border: 1.5px solid #aed6f1;
+  box-shadow: 0 0 12px var(--sapphire-glow), 0 2px 5px rgba(0, 0, 0, 0.7);
+  transition: transform 0.25s, opacity 0.25s, filter 0.25s;
+}
+
+.energy-orb.spent {
+  background: #242938;
+  border-color: #3e4459;
+  box-shadow: none;
+  opacity: 0.35;
+  transform: scale(0.85);
+}
+
+.energy-text {
+  font-family: var(--font-fantasy);
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #74b9ff;
+  letter-spacing: 0.5px;
+}
+
+/* ==========================================================================
+   BARRA DE RELÍQUIAS & STATUS BADGES DOS COMBATENTES (SPRINT 1)
+   ========================================================================== */
+
+/* Barra de Relíquias */
+.relics-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  background: rgba(18, 20, 28, 0.85);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+  min-height: 42px;
+}
+
+.relic-slot {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #252838 0%, #10121a 100%);
+  border: 1.5px solid var(--gold-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+  position: relative;
+}
+
+.relic-slot svg {
+  width: 22px;
+  height: 22px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7));
+}
+
+.relic-slot:hover {
+  transform: scale(1.18) translateY(-2px);
+  border-color: var(--gold-light);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8), 0 0 14px var(--gold-glow);
+  z-index: 20;
+}
+
+/* Fileira de Efeitos de Status dos Combatentes */
+.status-effects-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 26px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+  z-index: 12;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 12px;
+  font-family: var(--font-fantasy);
+  font-size: 0.76rem;
+  font-weight: 800;
+  border: 1.5px solid transparent;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  animation: statusPop 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  cursor: help;
+  position: relative;
+}
+
+.status-badge svg {
+  width: 14px;
+  height: 14px;
+}
+
+.status-count {
+  line-height: 1;
+}
+
+@keyframes statusPop {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Tipos de Status Badges com Cores & Glows Específicos */
+.status-badge.badge-strength {
+  background: rgba(234, 88, 12, 0.25);
+  border-color: #f97316;
+  color: #fdba74;
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.4);
+}
+
+.status-badge.badge-vulnerable {
+  background: rgba(168, 85, 247, 0.25);
+  border-color: #a855f7;
+  color: #e9d5ff;
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
+}
+
+.status-badge.badge-weak {
+  background: rgba(100, 116, 139, 0.3);
+  border-color: #94a3b8;
+  color: #e2e8f0;
+  box-shadow: 0 0 8px rgba(148, 163, 184, 0.3);
+}
+
+.status-badge.badge-burn {
+  background: rgba(220, 38, 38, 0.3);
+  border-color: #ef4444;
+  color: #fca5a5;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+  animation: burnFlicker 1.8s infinite ease-in-out;
+}
+
+.status-badge.badge-poison {
+  background: rgba(5, 150, 105, 0.28);
+  border-color: #10b981;
+  color: #6ee7b7;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.45);
+  animation: poisonPulse 2s infinite ease-in-out;
+}
+
+@keyframes burnFlicker {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; box-shadow: 0 0 14px rgba(239, 68, 68, 0.85); }
+}
+
+@keyframes poisonPulse {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; box-shadow: 0 0 14px rgba(16, 185, 129, 0.8); }
+}
+
+/* Área Inferior do Combate (Mão do Jogador & Decks) */
+.combat-bottom-bar {
+  width: 100%;
+  height: 240px;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 24px 16px;
+  background: linear-gradient(180deg, transparent 0%, rgba(8, 9, 13, 0.85) 35%, rgba(6, 7, 10, 0.98) 100%);
+  z-index: 20;
+}
+
+/* Pilha de Compra & Pilha de Descarte */
+.card-pile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  z-index: 25;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.card-pile:hover {
+  transform: translateY(-4px);
+}
+
+.pile-visual {
+  width: 52px;
+  height: 74px;
+  border-radius: 6px;
+  background: linear-gradient(145deg, #1f2334 0%, #10121b 100%);
+  border: 1.5px solid var(--border-frame);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
+}
+
+.pile-visual::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 2px;
+  right: -2px;
+  bottom: 3px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #191c2b;
+  z-index: -1;
+}
+
+.card-pile:hover .pile-visual {
+  border-color: var(--gold-primary);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.8), 0 0 12px var(--gold-glow);
+}
+
+.pile-count-badge {
+  background: rgba(14, 15, 22, 0.95);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-round);
+  padding: 2px 8px;
+  font-family: var(--font-fantasy);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-gold);
+}
+
+.pile-label {
+  font-family: var(--font-fantasy);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.8px;
+}
+
+/* Mão de Cartas em Leque Centralizada Absolutamente */
+.player-hand-container {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 12px;
+  margin: 0 auto;
+  z-index: 30;
+  max-width: 960px;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  perspective: 1000px;
+  overflow: visible;
+  padding-bottom: 6px;
+  pointer-events: none;
+}
+
+.player-hand {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+  height: 235px;
+  margin: 0 auto;
+  pointer-events: auto;
+}
+
+/* Disposição em Leque Suave das Cartas com Ótima Legibilidade */
+.player-hand .game-card {
+  position: relative;
+  margin: 0 clamp(-18px, -1.8vw, -6px);
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.22s ease, z-index 0.1s;
+  pointer-events: auto;
+}
+
+.player-hand .game-card:hover {
+  transform: translateY(clamp(-38px, -5vh, -50px)) scale(1.14) !important;
+  margin: 0 clamp(-4px, -0.4vw, 4px);
+  z-index: 100 !important;
+}
+
+/* Controles da Direita: Descarte e Finalizar Turno */
+.combat-right-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  z-index: 25;
+  flex-shrink: 0;
+}
+
+/* Botão "Finalizar Turno" */
+.end-turn-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 25;
+  flex-shrink: 0;
+  margin-left: 0;
+}
+
+.btn-end-turn {
+  padding: 12px 22px;
+  font-size: 1rem;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, #fae48c 0%, #d4af37 50%, #99781d 100%);
+  color: #0b0c10;
+  border: 1.5px solid #fae48c;
+  box-shadow: 0 4px 18px rgba(212, 175, 55, 0.45);
+  font-family: var(--font-fantasy);
+  font-weight: 800;
+  letter-spacing: 1px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-smooth);
+}
+
+.btn-subtext {
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: rgba(11, 12, 16, 0.7);
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+.btn-end-turn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  background: linear-gradient(180deg, #fce881 0%, #b89124 100%);
+  box-shadow: 0 6px 24px var(--gold-glow);
+}
+
+.btn-end-turn:disabled {
+  background: #252838;
+  color: #63677d;
+  border-color: #3b3f54;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Efeitos Visuais de Impacto (Floating Numbers & Tela) */
+
+/* Números Flutuantes de Dano / Bloqueio */
+.floating-number {
+  position: absolute;
+  font-family: var(--font-fantasy);
+  font-weight: 900;
+  font-size: 2.2rem;
+  pointer-events: none;
+  z-index: 500;
+  animation: floatNumberAnim 0.9s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+.floating-damage {
+  color: #ff3838;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9), 0 0 16px rgba(255, 56, 56, 0.6);
+}
+
+.floating-block {
+  color: #38ada9;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9), 0 0 16px rgba(56, 173, 169, 0.6);
+}
+
+.floating-heal {
+  color: #2ed573;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9), 0 0 16px rgba(46, 213, 115, 0.6);
+}
+
+@keyframes floatNumberAnim {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.6);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(-20px) scale(1.3);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-50px) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-75px) scale(0.9);
+  }
+}
+
+/* Tremor de Tela ao Sofrer Dano */
+.shake-screen {
+  animation: screenShakeAnim 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes screenShakeAnim {
+  10%, 90% { transform: translate3d(-3px, 0, 0); }
+  20%, 80% { transform: translate3d(5px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+  40%, 60% { transform: translate3d(6px, 0, 0); }
+}
+
+/* Flash de Impacto */
+.hit-flash {
+  filter: brightness(2.2) contrast(1.4) drop-shadow(0 0 20px #ff0000);
+  transition: filter 0.08s ease;
+}
+
+/* Flash na Tela */
+.screen-flash-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.25);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 400;
+  transition: opacity 0.15s ease-out;
+}
+.screen-flash-overlay.active {
+  opacity: 1;
+}
+
+/* Responsividade do Combate (Sprint 2 - Mobile & Tablet) */
+@media (max-width: 900px) {
+  .combat-stage {
+    padding: clamp(10px, 1.8vh, 18px) clamp(6px, 1.5vw, 16px);
+  }
+  .combatant {
+    width: clamp(120px, 26vw, 190px);
+  }
+  .combatant-avatar-frame {
+    width: clamp(84px, 16vw, 130px);
+    height: clamp(84px, 16vw, 130px);
+  }
+  .enemy-combatant.is-boss .combatant-avatar-frame {
+    width: clamp(110px, 22vw, 170px);
+    height: clamp(110px, 22vw, 170px);
+  }
+  .combat-bottom-bar {
+    padding: 0 10px 8px;
+    height: clamp(165px, 24vh, 215px);
+  }
+  .player-hand .game-card {
+    margin: 0 clamp(-32px, -3.2vw, -14px);
+  }
+}
+
+@media (max-width: 600px) {
+  .combat-top-bar {
+    padding: 6px 12px;
+  }
+  .encounter-title {
+    font-size: 0.88rem;
+  }
+  .combat-stage {
+    padding: 8px 4px;
+    gap: 4px;
+  }
+  .combatant {
+    width: 135px;
+  }
+  .combatant-avatar-frame {
+    width: 82px;
+    height: 82px;
+    margin-bottom: 4px;
+  }
+  .enemy-combatant.is-boss .combatant-avatar-frame {
+    width: 105px;
+    height: 105px;
+  }
+  .combatant-name {
+    font-size: 0.8rem;
+  }
+  .hp-bar {
+    height: 14px;
+  }
+  .hp-text {
+    font-size: 0.65rem;
+  }
+  .combat-bottom-bar {
+    padding: 0 4px 6px;
+    height: 175px;
+  }
+  .pile-visual {
+    width: 36px;
+    height: 52px;
+  }
+  .pile-label {
+    display: none;
+  }
+  .btn-end-turn {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+  .btn-subtext {
+    display: none;
+  }
+  .player-hand {
+    height: 170px;
+  }
+  .player-hand .game-card {
+    margin: 0 clamp(-36px, -4vw, -20px);
+  }
+}

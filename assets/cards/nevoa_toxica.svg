@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <radialGradient id="toxicBg" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#14532d"/>
+      <stop offset="50%" stop-color="#052e16"/>
+      <stop offset="100%" stop-color="#02140a"/>
+    </radialGradient>
+    <linearGradient id="gasGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#86efac"/>
+      <stop offset="40%" stop-color="#22c55e"/>
+      <stop offset="80%" stop-color="#15803d"/>
+      <stop offset="100%" stop-color="#052e16"/>
+    </linearGradient>
+    <filter id="toxicBlur" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="400" fill="url(#toxicBg)"/>
+
+  <!-- Dungeon Pillars in Background -->
+  <rect x="50" y="40" width="45" height="320" fill="#031b0e" stroke="#052e16" stroke-width="2"/>
+  <rect x="305" y="40" width="45" height="320" fill="#031b0e" stroke="#052e16" stroke-width="2"/>
+  <path d="M 40 40 L 105 40 L 95 65 L 50 65 Z" fill="#042714"/>
+  <path d="M 295 40 L 360 40 L 350 65 L 305 65 Z" fill="#042714"/>
+
+  <!-- Billowing Toxic Fog Clouds -->
+  <path d="M 30 280 Q 90 180 170 240 Q 240 160 320 220 Q 380 270 360 350 Q 240 380 140 360 Z" fill="url(#gasGrad1)" opacity="0.55" filter="url(#toxicBlur)"/>
+  <path d="M 70 200 Q 150 110 230 170 Q 300 130 350 200 Q 310 280 220 270 Q 120 290 70 200 Z" fill="#4ade80" opacity="0.45" filter="url(#toxicBlur)"/>
+  <path d="M 120 150 Q 200 70 280 130 Q 330 180 260 220 Q 170 210 120 150 Z" fill="#bbf7d0" opacity="0.35" filter="url(#toxicBlur)"/>
+
+  <!-- Sinister Skull forming within the smoke vapor -->
+  <g transform="translate(200, 190)" opacity="0.85">
+    <!-- Skull Cranium -->
+    <ellipse cx="0" cy="-25" rx="48" ry="42" fill="#22c55e" opacity="0.35" filter="url(#toxicBlur)"/>
+    <ellipse cx="0" cy="-25" rx="36" ry="32" fill="#15803d" opacity="0.5"/>
+    <!-- Eye Sockets (Dark Voids) -->
+    <ellipse cx="-16" cy="-28" rx="10" ry="12" fill="#02140a"/>
+    <ellipse cx="16" cy="-28" rx="10" ry="12" fill="#02140a"/>
+    <!-- Glowing Eye Centers -->
+    <circle cx="-16" cy="-28" r="3" fill="#86efac"/>
+    <circle cx="16" cy="-28" r="3" fill="#86efac"/>
+    <!-- Nasal Cavity -->
+    <polygon points="0,-14 -4,-4 4,-4" fill="#02140a"/>
+    <!-- Maxilla / Teeth -->
+    <rect x="-18" y="5" width="36" height="16" rx="4" fill="#14532d"/>
+    <line x1="-10" y1="5" x2="-10" y2="21" stroke="#02140a" stroke-width="2"/>
+    <line x1="-2" y1="5" x2="-2" y2="21" stroke="#02140a" stroke-width="2"/>
+    <line x1="6" y1="5" x2="6" y2="21" stroke="#02140a" stroke-width="2"/>
+  </g>
+
+  <!-- Boiling / Popping Poison Bubbles -->
+  <circle cx="110" cy="310" r="14" fill="#15803d" stroke="#86efac" stroke-width="2" opacity="0.85"/>
+  <circle cx="106" cy="305" r="4" fill="#ffffff" opacity="0.6"/>
+
+  <circle cx="280" cy="330" r="18" fill="#166534" stroke="#4ade80" stroke-width="2" opacity="0.85"/>
+  <circle cx="275" cy="324" r="5" fill="#ffffff" opacity="0.6"/>
+
+  <circle cx="210" cy="345" r="10" fill="#14532d" stroke="#86efac" stroke-width="1.5" opacity="0.9"/>
+  <circle cx="170" cy="270" r="8" fill="#15803d" stroke="#bbf7d0" stroke-width="1.5" opacity="0.75"/>
+
+  <!-- Drifting Spores and Particles -->
+  <circle cx="140" cy="110" r="3" fill="#86efac" filter="url(#toxicBlur)"/>
+  <circle cx="270" cy="90" r="3.5" fill="#bbf7d0" filter="url(#toxicBlur)"/>
+  <circle cx="80" cy="220" r="2.5" fill="#4ade80"/>
+  <circle cx="330" cy="160" r="2" fill="#86efac"/>
+  <circle cx="220" cy="70" r="2.5" fill="#ffffff"/>
+</svg>

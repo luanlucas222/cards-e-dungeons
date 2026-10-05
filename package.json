@@ -1,0 +1,53 @@
+{
+  "name": "cards-e-dungeons",
+  "version": "1.1.0",
+  "type": "module",
+  "description": "Cards e Dungeons - Roguelike Deckbuilder Game",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "node scripts/build-bundle.js",
+    "electron:start": "electron .",
+    "dist:win": "node scripts/build-bundle.js && electron-builder --win",
+    "mobile:prepare": "node scripts/build-bundle.js && node scripts/prepare-mobile.js",
+    "mobile:build": "node scripts/build-bundle.js && node scripts/prepare-mobile.js && npx cap sync android",
+    "mobile:open": "npx cap open android",
+    "test": "node tests/engine-test.js && node tests/frontend-verify.js && node tests/qa-e2e-check.js && node tests/gamepad-test.js",
+    "test:gamepad": "node tests/gamepad-test.js",
+    "test:browser": "node tests/browser-interaction-test.js"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
+    "electron": "^44.5.1",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.cardsedungeons.game",
+    "productName": "Cards e Dungeons",
+    "copyright": "Copyright © 2026",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/ui/icon.ico"
+    },
+    "files": [
+      "index.html",
+      "package.json",
+      "css/**/*",
+      "js/**/*",
+      "assets/**/*",
+      "electron/**/*"
+    ]
+  }
+}

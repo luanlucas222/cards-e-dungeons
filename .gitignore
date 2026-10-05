@@ -1,0 +1,24 @@
+node_modules/
+dist/
+www/
+.gemini/
+.system_generated/
+.github/
+*.log
+
+# Android build outputs and generated sync assets
+android/.gradle/
+android/build/
+android/app/build/
+android/app/src/main/assets/public/
+android/local.properties
+android/app/release/
+android/app/build/outputs/
+
+# Test output screenshots
+docs/screenshots/
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini

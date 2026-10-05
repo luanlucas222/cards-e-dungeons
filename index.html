@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Cards e Dungeons - Roguelike Deckbuilder</title>
+
+  <!-- PWA & Mobile Web App Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b0c10">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Cards e Dungeons">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/ui/icon-192.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="assets/ui/icon-192.png">
+
+  <!-- Google Fonts: Cinzel, Cinzel Decorative e Inter com fallbacks do sistema -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Cinzel+Decorative:wght@700;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Folhas de Estilo Modulares Dark Fantasy -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/combat.css">
+  <link rel="stylesheet" href="css/map.css">
+  <link rel="stylesheet" href="css/modal.css">
+  <link rel="stylesheet" href="css/cinematic.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Barra Superior Global (HUD Header) - Oculta no Menu Principal, ativa no jogo -->
+    <header class="game-header" style="display: none;">
+      <!-- Bloco Esquerdo: Logo compacta + Vida do Herói -->
+      <div class="hud-block hud-left">
+        <div class="brand-title">
+          <span id="brand-header-icon" class="brand-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2" class="svg-icon">
+              <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/>
+              <line x1="13" y1="19" x2="19" y2="13"/>
+              <line x1="16" y1="16" x2="20" y2="20"/>
+              <line x1="19" y1="21" x2="21" y2="19"/>
+            </svg>
+          </span>
+          <span class="brand-text">CARDS E DUNGEONS</span>
+        </div>
+
+        <!-- Vida do Herói -->
+        <div class="header-stat hp-stat" title="Pontos de Vida do Guerreiro">
+          <span class="stat-icon">❤️</span>
+          <div class="stat-bar-container">
+            <div id="hud-hp-bar-fill" class="stat-bar-fill fill-hp" style="width: 100%;"></div>
+          </div>
+          <span id="hud-hp-text">70 / 70</span>
+        </div>
+      </div>
+
+      <!-- Bloco Central: Ouro + Ato + Cronômetro -->
+      <div class="hud-block hud-center">
+        <!-- Ouro do Jogador -->
+        <div class="header-stat gold-stat" title="Ouro Coletado">
+          <span class="stat-icon">🪙</span>
+          <span id="hud-gold-text">50 Ouro</span>
+        </div>
+
+        <!-- Indicador de Ato e Andar -->
+        <div id="hud-act-stat" class="header-stat act-stat" data-tooltip="Ato Atual da Campanha">
+          <span class="stat-icon">🗺️</span>
+          <span id="hud-act-text">Ato I</span>
+        </div>
+
+        <!-- Cronômetro de Partida em Tempo Real -->
+        <div id="hud-timer-container" class="header-stat timer-stat" data-tooltip="Tempo Decorrido da Jornada">
+          <span class="stat-icon">⏱️</span>
+          <span id="hud-timer-text">00:00</span>
+        </div>
+      </div>
+
+      <!-- Bloco Direito: Cinto de 3 Poções + Relíquias + Baralho + Ações -->
+      <div class="hud-block hud-right">
+        <!-- Cinto de Poções Consumíveis (Fase 3) -->
+        <div id="hud-potions-container" class="hud-potions-container" data-tooltip="Cinto de Poções (Clique para consumir em combate)">
+          <div class="potion-slot" data-slot="0" id="potion-slot-0"></div>
+          <div class="potion-slot" data-slot="1" id="potion-slot-1"></div>
+          <div class="potion-slot" data-slot="2" id="potion-slot-2"></div>
+        </div>
+
+        <!-- Barra de Relíquias Passivas -->
+        <div id="relics-bar" class="relics-bar" data-tooltip="Relíquias Passivas Coletadas" style="display: none;"></div>
+
+        <!-- Botão Inspecionar Baralho -->
+        <div id="btn-hud-deck" class="header-stat deck-stat" data-tooltip="Inspecionar Baralho" role="button" tabindex="0">
+          <span id="hud-deck-icon" class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fae48c" stroke-width="2" style="width: 16px; height: 16px;">
+              <rect x="2" y="5" width="15" height="15" rx="2" ry="2"/>
+              <path d="M7 2h13a2 2 0 0 1 2 2v13"/>
+            </svg>
+          </span>
+          <span>Baralho (<span id="hud-deck-count">12</span>)</span>
+        </div>
+
+        <div class="header-actions">
+          <!-- Alternar Música Ambiente da Masmorra -->
+          <button id="btn-music" class="btn btn-icon" data-tooltip="Música Ambiente (Desativada)" aria-label="Alternar Música">🎵</button>
+          <!-- Alternar Som / Mudo -->
+          <button id="btn-hud-audio" class="btn btn-icon" data-tooltip="Som Ativado" aria-label="Alternar Som">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            </svg>
+          </button>
+          <!-- Abrir Guia de Regras -->
+          <button id="btn-hud-guide" class="btn btn-icon" data-tooltip="Como Jogar" aria-label="Como Jogar">?</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Área de Visualização das Telas -->
+    <main class="view-viewport">
+      <!-- 0. TELA: CINEMÁTICA / CUTSCENE (REMOTION-STYLE) -->
+      <section id="screen-cinematic" class="screen-view cinematic-screen">
+        <div class="cinematic-backdrop"></div>
+        <div class="cinematic-vignette"></div>
+        <canvas class="cinematic-particles-canvas"></canvas>
+        <div class="cinematic-content">
+          <span class="cinematic-chapter-tag">PRÓLOGO</span>
+          <h2 class="cinematic-headline">AS PROFUNDEZAS DO CALABOUÇO</h2>
+          <p class="cinematic-paragraph"></p>
+        </div>
+        <div class="cinematic-controls">
+          <button class="btn-cinematic-skip">Pular ⏭️</button>
+          <button class="btn-cinematic-next">Continuar ➔</button>
+        </div>
+      </section>
+
+      <!-- 1. TELA: MENU PRINCIPAL -->
+      <section id="screen-menu" class="screen-view menu-screen active">
+        <!-- Brasão Rúnico do Jogo -->
+        <div class="menu-crest-container">
+          <div class="menu-crest-shield">
+            <img src="assets/ui/menu_logo_emblem.png" alt="Cards e Dungeons Emblema" class="menu-emblem-img" />
+          </div>
+        </div>
+
+        <div class="game-logo-container">
+          <h1 class="logo-main-title">CARDS &amp; DUNGEONS</h1>
+          <p class="logo-sub-title">⚔️ O Calabouço das Profundezas ⚔️</p>
+        </div>
+
+        <div class="menu-buttons-list">
+          <button id="btn-continue" class="btn btn-menu-hero btn-continue-pulse" style="display: none; background: linear-gradient(180deg, #2574d4 0%, #154c91 100%); border-color: #6bb0ff;">
+            <span class="btn-icon-symbol">🔄</span>
+            <span>Continuar Jornada</span>
+          </button>
+          <button id="btn-start-game" class="btn btn-menu-hero">
+            <span class="btn-icon-symbol">⚔️</span>
+            <span>Nova Jornada</span>
+          </button>
+          <button id="btn-menu-guide" class="btn btn-menu-secondary">
+            <span class="btn-icon-symbol">📜</span>
+            <span>Como Jogar</span>
+          </button>
+          <button id="btn-menu-credits" class="btn btn-menu-secondary">
+            <span class="btn-icon-symbol">🛡️</span>
+            <span>Créditos &amp; Regras</span>
+          </button>
+          <button id="btn-pwa-install" class="btn btn-menu-secondary" style="display: none; border-color: var(--gold-light);">
+            <span class="btn-icon-symbol">📲</span>
+            <span>Instalar no Celular</span>
+          </button>
+        </div>
+
+        <div class="menu-footer-badge">
+          <span>v1.0 • Edição Homologada • 100% Sem Dependências</span>
+        </div>
+      </section>
+
+      <!-- 2. TELA: MAPA DO CALABOUÇO (ÁRVORE DE CAMINHOS) -->
+      <section id="screen-map" class="screen-view map-screen">
+        <div class="map-header">
+          <div class="map-title-box">
+            <h2 class="map-title">CAMINHO DAS PROFUNDEZAS</h2>
+            <p class="map-subtitle">Escolha seu trajeto até o covil do Dragão Tirano</p>
+          </div>
+          <div id="map-floor-indicator" class="badge badge-gold">Andar 1 de 6</div>
+        </div>
+
+        <div class="map-viewport">
+          <div class="map-tree-container" id="map-tree">
+            <svg class="map-connections-svg" id="map-connections-svg"></svg>
+            <!-- Camadas de nós geradas proceduralmente pelo MapRenderer -->
+          </div>
+        </div>
+
+        <div class="map-footer-hint">
+          <div class="map-legend">
+            <span class="legend-item"><span class="legend-dot dot-combat"></span> ⚔️ Combate Comum</span>
+            <span class="legend-item"><span class="legend-dot dot-elite" style="background:#e67e22; border-color:#d35400;"></span> 🐂 Elite</span>
+            <span class="legend-item"><span class="legend-dot dot-treasure" style="background:#f59e0b; border-color:#d97706;"></span> 🎁 Tesouro</span>
+            <span class="legend-item"><span class="legend-dot dot-shrine"></span> ⛺ Santuário</span>
+            <span class="legend-item"><span class="legend-dot dot-boss"></span> 👑 Chefe</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. TELA: ARENA DE COMBATE -->
+      <section id="screen-combat" class="screen-view combat-screen">
+        <div class="combat-top-bar">
+          <div class="encounter-info">
+            <span class="encounter-icon-badge">⚔️</span>
+            <h3 id="combat-encounter-title" class="encounter-title">Combate contra Monstro</h3>
+          </div>
+          <span id="combat-turn-counter" class="turn-counter-badge">Turno 1</span>
+        </div>
+
+        <div class="combat-stage">
+          <!-- Combatente: Herói -->
+          <div id="hero-combatant" class="combatant hero-combatant">
+            <div id="hero-avatar-box" class="combatant-avatar-frame"></div>
+            <div class="combatant-info">
+              <div class="combatant-name">Guerreiro Rúnico</div>
+              <div class="hp-bar-wrapper">
+                <div id="hero-armor-badge" class="armor-badge" title="Armadura / Bloqueio Ativo">0</div>
+                <div class="hp-bar">
+                  <div id="hero-hp-bar-fill" class="hp-bar-fill" style="width: 100%;"></div>
+                  <div id="hero-hp-text" class="hp-text">70 / 70</div>
+                </div>
+              </div>
+              <!-- Badges de Status do Herói (Buffs e Debuffs) -->
+              <div id="hero-status-badges" class="status-effects-row"></div>
+              <div class="energy-container">
+                <div id="hero-energy-orbs" class="energy-orbs-group"></div>
+                <span id="hero-energy-text" class="energy-text">3/3</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Centro: Notificação Rápida de Ação e Efeitos -->
+          <div id="combat-action-notification" class="combat-action-notification"></div>
+
+          <!-- Combatente: Inimigo -->
+          <div id="enemy-combatant" class="combatant enemy-combatant">
+            <!-- Placa Flutuante de Intenção do Monstro -->
+            <div id="enemy-intent-bubble" class="enemy-intent-bubble"></div>
+            <div id="enemy-avatar-box" class="combatant-avatar-frame"></div>
+            <div class="combatant-info">
+              <div id="enemy-name" class="combatant-name">Inimigo</div>
+              <div class="hp-bar-wrapper">
+                <div id="enemy-armor-badge" class="armor-badge" title="Armadura do Inimigo">0</div>
+                <div class="hp-bar">
+                  <div id="enemy-hp-bar-fill" class="hp-bar-fill" style="width: 100%;"></div>
+                  <div id="enemy-hp-text" class="hp-text">25 / 25</div>
+                </div>
+              </div>
+              <!-- Badges de Status do Inimigo (Buffs e Debuffs) -->
+              <div id="enemy-status-badges" class="status-effects-row"></div>
+            </div>
+          </div>
+
+          <!-- Canvas 2D de Efeitos Visuais de Combate (Combat FX: Slashes, Chamas, Ondas de Choque e Veneno) -->
+          <canvas id="combat-fx-canvas" class="combat-fx-canvas"></canvas>
+
+          <!-- Flash de Efeito na Arena -->
+          <div id="combat-screen-flash" class="screen-flash-overlay"></div>
+        </div>
+
+        <!-- Barra Inferior do Combate: Mão do Jogador, Montes e Finalizar Turno -->
+        <div class="combat-bottom-bar">
+          <!-- Pilha de Compra -->
+          <div id="pile-draw" class="card-pile" data-tooltip="Monte de Compra (Cartas a Comprar)">
+            <div class="pile-visual">
+              <span id="draw-pile-count" class="pile-count-badge">0</span>
+            </div>
+            <span class="pile-label">Compra</span>
+          </div>
+
+          <!-- Mão de Cartas em Leque -->
+          <div class="player-hand-container">
+            <div id="player-hand" class="player-hand"></div>
+          </div>
+
+          <!-- Controles da Direita: Descarte e Finalizar Turno -->
+          <div class="combat-right-controls">
+            <!-- Pilha de Descarte -->
+            <div id="pile-discard" class="card-pile" data-tooltip="Monte de Descarte (Cartas Jogadas)">
+              <div class="pile-visual">
+                <span id="discard-pile-count" class="pile-count-badge">0</span>
+              </div>
+              <span class="pile-label">Descarte</span>
+            </div>
+
+            <!-- Botão Finalizar Turno -->
+            <div class="end-turn-container">
+              <button id="btn-end-turn" class="btn btn-end-turn">
+                <span>Finalizar Turno</span>
+                <span class="btn-subtext">Passar a vez</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. TELA: VITÓRIA GLORIOSA -->
+      <section id="screen-victory" class="screen-view menu-screen">
+        <div class="game-over-modal is-victory">
+          <div id="victory-icon-box" class="game-over-icon"></div>
+          <h1 class="game-over-title">VITÓRIA GLORIOSA!</h1>
+          <p class="game-over-subtitle">
+            O Grande Dragão Tirano sucumbiu diante de sua espada rúnica! Você conquistou as profundezas do calabouço e se tornou a maior lenda do reino.
+          </p>
+
+          <div class="game-over-stats">
+            <div class="stat-box">
+              <div id="stat-victory-floors" class="stat-box-val">6</div>
+              <div class="stat-box-label">Andares Conquistados</div>
+            </div>
+            <div class="stat-box">
+              <div id="stat-victory-monsters" class="stat-box-val">0</div>
+              <div class="stat-box-label">Inimigos Derrotados</div>
+            </div>
+            <div class="stat-box">
+              <div id="stat-victory-deck" class="stat-box-val">12</div>
+              <div class="stat-box-label">Cartas Finais</div>
+            </div>
+          </div>
+
+          <div class="game-over-actions">
+            <button id="btn-victory-restart" class="btn btn-primary-gold btn-large">Jogar Novamente</button>
+            <button id="btn-victory-menu" class="btn btn-menu-secondary btn-large">Menu Principal</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. TELA: DERROTA (GAME OVER) -->
+      <section id="screen-defeat" class="screen-view menu-screen">
+        <div class="game-over-modal is-defeat">
+          <div id="defeat-icon-box" class="game-over-icon"></div>
+          <h1 class="game-over-title">VOCÊ TOMBOU...</h1>
+          <p id="defeat-subtitle" class="game-over-subtitle">
+            Sua jornada encontrou um fim trágico nas trevas da masmorra. Recupere o ânimo e tente novamente!
+          </p>
+
+          <div class="game-over-stats">
+            <div class="stat-box">
+              <div id="stat-defeat-floors" class="stat-box-val">1</div>
+              <div class="stat-box-label">Andar Alcançado</div>
+            </div>
+            <div class="stat-box">
+              <div id="stat-defeat-monsters" class="stat-box-val">0</div>
+              <div class="stat-box-label">Inimigos Derrotados</div>
+            </div>
+            <div class="stat-box">
+              <div id="stat-defeat-deck" class="stat-box-val">12</div>
+              <div class="stat-box-label">Cartas no Deck</div>
+            </div>
+          </div>
+
+          <div class="game-over-actions">
+            <button id="btn-defeat-restart" class="btn btn-crimson btn-large">Tentar Novamente</button>
+            <button id="btn-defeat-menu" class="btn btn-menu-secondary btn-large">Menu Principal</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ==================================================================== -->
+    <!-- MODAIS E JANELAS SOBREPOSTAS                                         -->
+    <!-- ==================================================================== -->
+
+    <!-- Modal 1: Inspecionar Deck & Reserva -->
+    <div id="modal-deck" class="modal-backdrop">
+      <div class="modal-window modal-deck-mgmt-window">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>🛡️</span>
+            <span id="deck-modal-title">Gestão do Baralho</span>
+          </div>
+          <span id="deck-modal-count" class="deck-count-indicator">12/15 Cartas</span>
+          <button class="modal-close-btn" aria-label="Fechar">&times;</button>
+        </div>
+        <!-- Abas de Navegação Tática: Baralho de Combate vs Baú de Reserva -->
+        <div class="deck-modal-tabs">
+          <button id="btn-tab-active-deck" class="deck-tab-btn active">⚔️ Baralho de Combate (<span id="tab-active-count">12/15</span>)</button>
+          <button id="btn-tab-reserve-deck" class="deck-tab-btn">📦 Baú de Reserva (<span id="tab-reserve-count">0</span>)</button>
+        </div>
+        <div class="modal-body">
+          <p id="deck-tab-hint" class="deck-tab-hint" style="text-align: center; color: var(--gold-light); font-size: 0.88rem; margin-bottom: 14px;">
+            Cartas ativas que serão compradas durante o combate (mínimo 10, máximo 15). Clique em uma carta para movê-la para a reserva.
+          </p>
+          <div id="deck-modal-grid" class="deck-view-grid card-grid-view"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Substituição Tática de Cartas (Teto de 15 Cartas) -->
+    <div id="modal-card-swap" class="modal-backdrop">
+      <div class="modal-window modal-card-swap-window">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>⚖️</span>
+            <span>Substituição Tática de Baralho</span>
+          </div>
+          <span class="badge badge-gold" id="swap-modal-badge">Limite: 15/15 Cartas</span>
+          <button class="modal-close-btn" aria-label="Fechar">&times;</button>
+        </div>
+        <div class="modal-body card-swap-modal-body">
+          <div class="card-swap-banner">
+            <p>Seu <strong>Baralho de Combate atingiu o limite de 15 cartas</strong>! Selecione uma carta abaixo para substituir (ela irá para o <strong>Baú de Reserva</strong>), ou envie a nova carta direto para a reserva:</p>
+          </div>
+          <div class="card-swap-layout">
+            <!-- Coluna Esquerda: Nova Carta Selecionada -->
+            <div class="card-swap-new-col">
+              <h4 class="card-swap-col-title">✨ Nova Carta Coletada</h4>
+              <div id="card-swap-new-slot" class="card-swap-target-slot"></div>
+              <div class="card-swap-actions-row">
+                <button id="btn-swap-to-reserve" class="btn btn-secondary btn-full">
+                  <span>📦 Guardar na Reserva</span>
+                </button>
+                <button id="btn-swap-to-gold" class="btn btn-secondary btn-full">
+                  <span>🪙 Converter em 15 Ouro</span>
+                </button>
+              </div>
+            </div>
+            <!-- Coluna Direita: Cartas Atuais do Deck para Substituição -->
+            <div class="card-swap-deck-col">
+              <h4 class="card-swap-col-title">⚔️ Selecione a Carta a Substituir no Baralho</h4>
+              <div id="card-swap-deck-grid" class="deck-view-grid card-grid-view"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Seletor Visual de Cartas do Baralho (Forja / Acampamento) -->
+    <div id="modal-deck-selector" class="modal-backdrop">
+      <div class="modal-window">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span id="deck-selector-icon">🔨</span>
+            <span id="deck-selector-title">Forjar &amp; Aprimorar Carta (+)</span>
+          </div>
+          <button class="modal-close-btn" aria-label="Fechar">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p id="deck-selector-subtitle" style="text-align: center; color: var(--gold-light); margin-bottom: 16px; font-size: 0.95rem;">
+            Selecione uma carta do seu baralho para forjar sua versão aprimorada (+):
+          </p>
+          <div id="deck-selector-grid" class="deck-view-grid card-grid-view"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Sala do Tesouro / Baú Ancestral -->
+    <div id="modal-treasure" class="modal-backdrop">
+      <div class="modal-window modal-treasure-window">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>🎁</span>
+            <span>Sala do Tesouro Ancestral</span>
+          </div>
+        </div>
+        <div class="modal-body treasure-modal-body">
+          <div class="treasure-banner" style="text-align: center; margin-bottom: 20px;">
+            <div class="treasure-chest-anim" style="font-size: 3.5rem; margin-bottom: 8px;">💎</div>
+            <h3 style="color: var(--gold-primary); font-family: var(--font-fantasy); margin-bottom: 6px;">O Baú das Relíquias Perdidas</h3>
+            <p style="color: #cbd5e1; font-size: 0.95rem; max-width: 500px; margin: 0 auto;">
+              Você descobriu uma câmara secreta intocada! Diante de você repousa um baú dourado resplandecente. Escolha uma das dádivas abaixo para fortalecer sua jornada:
+            </p>
+          </div>
+          <div class="treasure-options-grid" id="treasure-options-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 18px;">
+            <!-- Opção 1: Relíquia Rara -->
+            <div class="treasure-option-card sanctuary-option-card" id="treasure-opt-relic" style="cursor: pointer; padding: 18px; border: 1px solid var(--border-frame); border-radius: 8px; text-align: center; background: rgba(20, 24, 38, 0.85); transition: all 0.2s ease;">
+              <div class="option-icon" style="font-size: 2.2rem; margin-bottom: 8px;">👑</div>
+              <h4 style="color: var(--gold-light); margin-bottom: 6px;" id="treasure-relic-title">Relíquia Rara</h4>
+              <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 14px;" id="treasure-relic-desc">Obtenha um artefato com poder passivo supremo.</p>
+              <button class="btn btn-secondary btn-full" id="btn-treasure-relic">Reivindicar Relíquia</button>
+            </div>
+            <!-- Opção 2: Grande Quantia de Ouro -->
+            <div class="treasure-option-card sanctuary-option-card" id="treasure-opt-gold" style="cursor: pointer; padding: 18px; border: 1px solid var(--border-frame); border-radius: 8px; text-align: center; background: rgba(20, 24, 38, 0.85); transition: all 0.2s ease;">
+              <div class="option-icon" style="font-size: 2.2rem; margin-bottom: 8px;">🪙</div>
+              <h4 style="color: var(--gold-light); margin-bottom: 6px;" id="treasure-gold-title">Baú de Ouro (+100 🪙)</h4>
+              <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 14px;">Encha seus bolsos para comprar no próximo mercador.</p>
+              <button class="btn btn-secondary btn-full" id="btn-treasure-gold">Coletar Ouro</button>
+            </div>
+            <!-- Opção 3: Poção & Elixir de Vitalidade -->
+            <div class="treasure-option-card sanctuary-option-card" id="treasure-opt-potion" style="cursor: pointer; padding: 18px; border: 1px solid var(--border-frame); border-radius: 8px; text-align: center; background: rgba(20, 24, 38, 0.85); transition: all 0.2s ease;">
+              <div class="option-icon" style="font-size: 2.2rem; margin-bottom: 8px;">🧪</div>
+              <h4 style="color: var(--gold-light); margin-bottom: 6px;">Elixir &amp; Poção</h4>
+              <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 14px;">Recupere +35% da sua Vida máxima e ganhe uma Poção.</p>
+              <button class="btn btn-secondary btn-full" id="btn-treasure-potion">Beber &amp; Guardar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal 2: Santuário / Acampamento Místico -->
+    <div id="modal-shrine" class="modal-backdrop">
+      <div class="modal-window">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>⛺</span>
+            <span>Santuário Místico</span>
+          </div>
+          <button class="modal-close-btn" aria-label="Fechar">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="sanctuary-banner">
+            <p class="sanctuary-lore">"O calor desta fogueira sagrada renova sua alma. Escolha seu destino para seguir em frente:"</p>
+          </div>
+
+          <div class="sanctuary-options-grid">
+            <!-- Opção 1: Descanso / Fogueira (+30% HP) -->
+            <div id="shrine-opt-heal" class="sanctuary-option-card option-heal" role="button" tabindex="0">
+              <div class="sanctuary-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2" class="svg-icon">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  <line x1="12" y1="8" x2="12" y2="14"/>
+                  <line x1="9" y1="11" x2="15" y2="11"/>
+                </svg>
+              </div>
+              <div class="sanctuary-option-title">Descansar (+30% de Vida)</div>
+              <div class="sanctuary-option-desc">Recupere suas energias junto às brasas ardentes e restaure 30% da vida máxima.</div>
+            </div>
+
+            <!-- Opção 2: Forjar & Aprimorar (+) -->
+            <div id="shrine-opt-forge" class="sanctuary-option-card option-forge" role="button" tabindex="0">
+              <div class="sanctuary-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fae48c" stroke-width="2" class="svg-icon">
+                  <polygon points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/>
+                  <line x1="13" y1="19" x2="19" y2="13"/>
+                  <line x1="16" y1="16" x2="20" y2="20"/>
+                  <line x1="19" y1="21" x2="21" y2="19"/>
+                </svg>
+              </div>
+              <div class="sanctuary-option-title">Forjar &amp; Aprimorar (+)</div>
+              <div class="sanctuary-option-desc">Utilize a bigorna do acampamento para transformar uma carta em sua versão (+) com poderes elevados.</div>
+            </div>
+
+            <!-- Opção 3: Remover Carta (compatibilidade de testes) -->
+            <div id="shrine-opt-remove" class="sanctuary-option-card option-remove" role="button" tabindex="0" style="display: none;">
+              <div class="sanctuary-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#ff7675" stroke-width="2" class="svg-icon">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                  <line x1="10" y1="11" x2="10" y2="17"/>
+                  <line x1="14" y1="11" x2="14" y2="17"/>
+                </svg>
+              </div>
+              <div class="sanctuary-option-title">Purificar Baralho</div>
+              <div class="sanctuary-option-desc">Remova permanentemente uma carta indesejada do seu baralho.</div>
+            </div>
+
+            <!-- Opção 4: Duplicar Carta (compatibilidade de testes) -->
+            <div id="shrine-opt-duplicate" class="sanctuary-option-card option-duplicate" role="button" tabindex="0" style="display: none;">
+              <div class="sanctuary-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#f1c40f" stroke-width="2" class="svg-icon">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+              </div>
+              <div class="sanctuary-option-title">Espelho de Almas</div>
+              <div class="sanctuary-option-desc">Crie uma cópia idêntica da sua carta mais poderosa.</div>
+            </div>
+
+            <!-- Opção 5: Aprender Nova Carta (compatibilidade de testes) -->
+            <div id="shrine-opt-blessing" class="sanctuary-option-card" role="button" tabindex="0" style="display: none;">
+              <div class="sanctuary-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#a29bfe" stroke-width="2" class="svg-icon">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+              </div>
+              <div class="sanctuary-option-title">Bênção Ancestral</div>
+              <div class="sanctuary-option-desc">Escolha uma entre 3 cartas raras de combate.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal 3: Recompensa de Combate -->
+    <div id="modal-reward" class="modal-backdrop">
+      <div class="modal-window">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>🎁</span>
+            <span>Recompensa de Combate</span>
+          </div>
+        </div>
+        <div class="modal-body">
+          <!-- Resumo de Espólios HD (Baú e Ouro Compactos) -->
+          <div class="reward-loot-summary-row">
+            <div class="reward-chest-showcase">
+              <div class="reward-chest-aura"></div>
+              <img src="assets/ui/chest_reward.png" class="reward-chest-img" alt="Baú de Recompensas" />
+            </div>
+            <!-- Banner de Ouro Coletado (Fase 4) -->
+            <div id="reward-gold-box" class="reward-gold-banner">🪙 +<span id="reward-gold-amount">20</span> Ouro Coletado!</div>
+          </div>
+
+          <!-- Banner de Relíquia de Elite conquistada -->
+          <div id="reward-relic-banner" class="relic-reward-banner" style="display: none; margin-bottom: 20px; padding: 14px 18px; border: 2px solid var(--gold-primary); background: linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(20,22,33,0.9) 100%); border-radius: var(--radius-md); text-align: center;">
+            <div style="font-family: var(--font-fantasy); font-size: 0.85rem; color: var(--gold-light); letter-spacing: 1.5px; text-transform: uppercase;">✨ Relíquia Ancestral de Elite Conquistada! ✨</div>
+            <div id="reward-relic-content" style="display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 10px;">
+              <div id="reward-relic-icon" class="relic-slot" style="width: 44px; height: 44px;"></div>
+              <div style="text-align: left;">
+                <div id="reward-relic-name" style="font-family: var(--font-fantasy); font-weight: 700; color: #fff; font-size: 1.1rem;"></div>
+                <div id="reward-relic-desc" style="font-size: 0.82rem; color: var(--text-muted); max-width: 420px;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="reward-header-text">Escolha 1 carta para reforçar seu baralho:</div>
+          <div id="reward-cards-container" class="reward-cards-container"></div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-skip-reward" class="btn btn-secondary">Pular Recompensa</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal 0: Seleção de Classe de Herói -->
+    <div id="modal-class-select" class="modal-backdrop">
+      <div class="modal-window modal-class-select-window">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>🛡️</span>
+            <span>Escolha sua Classe de Herói</span>
+          </div>
+          <button class="modal-close-btn" aria-label="Fechar">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p style="text-align: center; color: var(--text-muted); margin-bottom: 18px; font-size: 0.95rem;">
+            Cada herói possui atributos próprios, deck inicial exclusivo e relíquia nativa para a descida ao calabouço.
+          </p>
+          <div class="class-cards-grid">
+            <!-- 1. GUERREIRO RÚNICO -->
+            <div class="hero-class-card" data-class="warrior">
+              <span class="class-badge">⚔️ Guerreiro</span>
+              <div class="class-avatar-box">
+                <img src="assets/sprites/hero.jpg" class="class-avatar-img" alt="Guerreiro Rúnico" onerror="this.src=''; this.style.display='none';">
+              </div>
+              <h3 class="class-name">Guerreiro Rúnico</h3>
+              <div class="class-subtitle">Mestre em Força &amp; Armadura</div>
+              <div class="class-stats-row">
+                <span class="class-stat-pill" title="Vida Máxima">❤️ 70 HP</span>
+                <span class="class-stat-pill" title="Energia por Turno">⚡ 3 Mana</span>
+              </div>
+              <div class="class-relic-tag">✨ Relíquia: Amuleto da Força (+2 Força)</div>
+              <p class="class-description">
+                Especialista em impacto físico brutal, quebra de escudos e guarda de aço impenetrável.
+              </p>
+              <button class="btn btn-primary-gold btn-select-class">Jogar como Guerreiro</button>
+            </div>
+
+            <!-- 2. LADINA DAS SOMBRAS -->
+            <div class="hero-class-card" data-class="rogue">
+              <span class="class-badge" style="color: #6ee7b7; border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.15);">🗡️ Ladina</span>
+              <div class="class-avatar-box" style="border-color: #10b981;">
+                <img src="assets/sprites/goblin.jpg" class="class-avatar-img" alt="Ladina das Sombras" onerror="this.src=''; this.style.display='none';">
+              </div>
+              <h3 class="class-name">Ladina das Sombras</h3>
+              <div class="class-subtitle" style="color: #6ee7b7;">Mestra em Agilidade &amp; Veneno</div>
+              <div class="class-stats-row">
+                <span class="class-stat-pill" title="Vida Máxima">❤️ 58 HP</span>
+                <span class="class-stat-pill" title="Energia por Turno">⚡ 3 Mana</span>
+              </div>
+              <div class="class-relic-tag" style="color: #34d399; border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.12);">☠️ Relíquia: Frasco Peçonhento (+3 Veneno)</div>
+              <p class="class-description">
+                Adagas rápidas, esquiva e toxinas mortais que corroem a vida do oponente ignorando escudos.
+              </p>
+              <button class="btn btn-primary-gold btn-select-class">Jogar como Ladina</button>
+            </div>
+
+            <!-- 3. MAGO ELEMENTAL -->
+            <div class="hero-class-card" data-class="mage">
+              <span class="class-badge" style="color: #a78bfa; border-color: rgba(139,92,246,0.4); background: rgba(139,92,246,0.15);">🔮 Mago</span>
+              <div class="class-avatar-box" style="border-color: #8b5cf6;">
+                <img src="assets/sprites/mage.jpg" class="class-avatar-img" alt="Mago Elemental" onerror="this.src=''; this.style.display='none';">
+              </div>
+              <h3 class="class-name">Mago Elemental</h3>
+              <div class="class-subtitle" style="color: #a78bfa;">Mestre em Feitiços &amp; Mana</div>
+              <div class="class-stats-row">
+                <span class="class-stat-pill" title="Vida Máxima">❤️ 52 HP</span>
+                <span class="class-stat-pill" title="Energia por Turno">⚡ 4 Mana</span>
+              </div>
+              <div class="class-relic-tag" style="color: #a78bfa; border-color: rgba(139,92,246,0.4); background: rgba(139,92,246,0.12);">🔮 Relíquia: Orbe Ancião (+1 Mana Extra)</div>
+              <p class="class-description">
+                Possui 4 pontos de energia por turno, canalizando rajadas de fogo e gelo com compras cósmicas aceleradas.
+              </p>
+              <button class="btn btn-primary-gold btn-select-class">Jogar como Mago</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal 5: A Loja do Mercador Renegado -->
+    <div id="modal-merchant" class="modal-backdrop">
+      <div class="modal-window modal-merchant-window">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>💰</span>
+            <span>O Mercador Renegado</span>
+          </div>
+          <div class="merchant-gold-display">
+            <span>🪙 Seu Ouro:</span>
+            <span id="merchant-player-gold" class="gold-amount">0</span>
+          </div>
+        </div>
+        <div class="modal-body merchant-modal-body">
+          <!-- Banner do Mercador com Falas Dinâmicas -->
+          <div class="merchant-dialogue-banner">
+            <div class="merchant-portrait-box">
+              <img src="assets/sprites/mage.jpg" class="merchant-portrait-img" alt="Mercador" onerror="this.src=''; this.style.display='none';">
+              <div class="merchant-portrait-avatar">🧙‍♂️</div>
+            </div>
+            <div class="merchant-speech-container">
+              <div class="merchant-speaker-name">Mestre Alistair, o Mercador Renegado</div>
+              <p id="merchant-speech-bubble" class="merchant-speech-text">
+                "Moedas brilhantes compram mais uma respirada nestas catacumbas..."
+              </p>
+            </div>
+          </div>
+
+          <!-- Seção 1: Cartas à Venda -->
+          <div class="merchant-section">
+            <h4 class="merchant-section-title">
+              <span>🃏 Cartas Raras &amp; Feitiços</span>
+              <span class="merchant-section-sub">Adicione novos golpes ao seu baralho</span>
+            </h4>
+            <div id="merchant-cards-grid" class="merchant-cards-grid"></div>
+          </div>
+
+          <!-- Seção 2: Relíquias Místicas -->
+          <div class="merchant-section">
+            <h4 class="merchant-section-title">
+              <span>✨ Relíquias Ancestrais</span>
+              <span class="merchant-section-sub">Efeitos passivos permanentes</span>
+            </h4>
+            <div id="merchant-relics-grid" class="merchant-relics-grid"></div>
+          </div>
+
+          <!-- Seção 3: Serviço de Purificação do Deck -->
+          <div class="merchant-section merchant-purification-section">
+            <h4 class="merchant-section-title">
+              <span>🔥 Altar de Purificação</span>
+              <span class="merchant-section-sub">Remova permanentemente uma carta fraca</span>
+            </h4>
+            <div class="purification-card">
+              <div class="purification-info">
+                <span class="purification-icon">📜🔥</span>
+                <div>
+                  <div class="purification-name">Incineração Arcana de Carta</div>
+                  <div class="purification-desc">Afine seu baralho para comprar com mais frequência suas melhores cartas.</div>
+                </div>
+              </div>
+              <button id="btn-merchant-remove-card" class="btn btn-primary-gold btn-buy-service">
+                <span>Purificar Carta</span>
+                <span class="service-price">🪙 75 Ouro</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-leave-merchant" class="btn btn-secondary btn-large">
+            <span>Retornar ao Mapa</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Evento Narrativo Misterioso (Fase 4) -->
+    <div id="modal-event" class="modal-backdrop">
+      <div class="modal-window modal-event-window">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span class="event-header-icon" id="event-header-icon">❓</span>
+            <span id="event-title">O Altar dos Deuses Esquecidos</span>
+          </div>
+          <div class="event-badge-tag">ENCONTRO MISTERIOSO</div>
+        </div>
+        <div class="modal-body event-modal-body">
+          <div class="event-narrative-container">
+            <div class="event-illustration-box" id="event-illustration-box"></div>
+            <div class="event-story-box">
+              <p class="event-story-text" id="event-story-text">
+                Um monólito de obsidiana ancestral emana uma névoa púrpura gélida...
+              </p>
+            </div>
+          </div>
+
+          <!-- Lista de Escolhas Dinâmicas -->
+          <div class="event-choices-container" id="event-choices-container"></div>
+
+          <!-- Banner de Resolução pós-escolha -->
+          <div class="event-resolution-box" id="event-resolution-box" style="display: none;">
+            <div class="event-resolution-title" id="event-resolution-title"></div>
+            <div class="event-resolution-text" id="event-resolution-text"></div>
+          </div>
+        </div>
+        <div class="modal-footer" id="event-modal-footer" style="display: none;">
+          <button id="btn-leave-event" class="btn btn-primary-gold btn-large">
+            <span>Prosseguir Jornada</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Transição Épica de Ato (Vitória do Ato & Recuperação de Fôlego) -->
+    <div id="modal-act-transition" class="modal-backdrop">
+      <div class="modal-window modal-act-transition-window">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span class="act-header-icon" id="act-transition-icon">🏆</span>
+            <span id="act-transition-title">ATO I CONQUISTADO!</span>
+          </div>
+          <div class="act-badge-tag" id="act-transition-badge">VITÓRIA DO ATO</div>
+        </div>
+        <div class="modal-body act-transition-body">
+          <div class="act-transition-banner">
+            <div class="act-boss-trophy-box" id="act-trophy-box">
+              <span class="act-boss-trophy-icon">🗿</span>
+            </div>
+            <div class="act-transition-story">
+              <h3 id="act-transition-headline" class="act-headline">O Golem Guardião Rúnico Foi Destruído!</h3>
+              <p id="act-transition-lore" class="act-lore">
+                As catacumbas ancestrais estremecem em silêncio. Um caminho secreto entre as rochas se abre, revelando a descida vertiginosa para o próximo patamar do calabouço.
+              </p>
+            </div>
+          </div>
+
+          <!-- Recuperação de Fôlego -->
+          <div class="act-recovery-box">
+            <div class="recovery-icon-circle">❤️‍🩹</div>
+            <div class="recovery-details">
+              <div class="recovery-title">Recuperação de Fôlego (+35% de Vida)</div>
+              <div class="recovery-text" id="act-recovery-text">Você descansa brevemente e recupera vitalidade. Seus sentidos estão aguçados para novos perigos.</div>
+            </div>
+            <div class="recovery-value" id="act-recovery-value">+25 HP</div>
+          </div>
+
+          <!-- Informações do Próximo Ato -->
+          <div class="act-next-preview">
+            <div class="next-act-label">Próximo Destino:</div>
+            <div class="next-act-name" id="act-next-name">Ato II: As Minas Profundas de Obsidiana</div>
+            <div class="next-act-boss" id="act-next-boss">Chefe Iminente: O Lich Rei dos Ossos (HP 85)</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-proceed-act" class="btn btn-primary-gold btn-large">
+            <span id="btn-proceed-act-text">Descer para o Ato II ➔</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal 4: Como Jogar / Guia de Regras -->
+    <div id="modal-guide" class="modal-backdrop">
+      <div class="modal-window" style="max-width: 650px;">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>📜</span>
+            <span>Como Jogar - Guia do Guerreiro</span>
+          </div>
+          <button class="modal-close-btn" aria-label="Fechar">&times;</button>
+        </div>
+        <div class="modal-body" style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main);">
+          <h4 style="color: var(--gold-light); font-family: var(--font-fantasy); margin-bottom: 6px;">⚡ Energia &amp; Compra</h4>
+          <p style="margin-bottom: 14px; color: var(--text-muted);">
+            No início de cada turno você recupera seus <strong>3 pontos de Energia</strong> e compra <strong>5 cartas</strong>. Todas as cartas não jogadas vão para a pilha de descarte ao fim do turno. Quando o monte de compra esvazia, o descarte é automaticamente reembaralhado.
+          </p>
+
+          <h4 style="color: var(--gold-light); font-family: var(--font-fantasy); margin-bottom: 6px;">👁️ Intenções Telegrafadas</h4>
+          <p style="margin-bottom: 14px; color: var(--text-muted);">
+            Monstros e chefes sempre revelam o que farão no topo de suas cabeças: ataque iminente, defesa ou canalização de força. Planeje seus turnos para levantar escudos contra ataques perigosos!
+          </p>
+
+          <h4 style="color: var(--gold-light); font-family: var(--font-fantasy); margin-bottom: 6px;">🛡️ Armadura e Escudos</h4>
+          <p style="margin-bottom: 14px; color: var(--text-muted);">
+            A armadura absorve todo dano antes que sua Vida seja atingida. A armadura temporária expira no início do próximo turno. A carta <strong>Chute</strong> destrói 2 de armadura inimiga antes do impacto!
+          </p>
+
+          <h4 style="color: var(--gold-light); font-family: var(--font-fantasy); margin-bottom: 6px;">⛺ Santuários e Otimização do Baralho</h4>
+          <p style="color: var(--text-muted);">
+            Nos santuários você pode descansar para curar vida ou <strong>purificar seu baralho</strong> removendo cartas fracas. Um baralho mais enxuto garante comprar seus golpes mais fortes com muito mais frequência!
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary-gold modal-close-btn-bottom" onclick="document.getElementById('modal-guide').classList.remove('active')">Entendido!</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra Global de Atalhos do Controle (Gamepad HUD Hints - Fase 2) -->
+    <div id="gamepad-hud-bar" class="gamepad-hud-bar" style="display: none;">
+      <div class="gamepad-hud-content" id="gamepad-hud-content"></div>
+    </div>
+
+    <!-- Contêiner de Notificações Toast -->
+    <div id="toast-container" class="toast-container"></div>
+  </div>
+
+  <!-- SCRIPT UNIVERSAL AUTÔNOMO: Roda sem CORS em file:/// e em servidores HTTP -->
+  <script src="js/game.bundle.js"></script>
+</body>
+</html>

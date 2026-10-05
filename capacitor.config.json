@@ -1,0 +1,13 @@
+{
+  "appId": "com.cardsedungeons.game",
+  "appName": "Cards e Dungeons",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#0b0c10",
+    "allowMixedContent": false,
+    "captureInput": true
+  }
+}
