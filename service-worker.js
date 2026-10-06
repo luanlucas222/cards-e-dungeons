@@ -3,7 +3,7 @@
  * Service Worker para execução 100% offline do jogo "Cards e Dungeons" em celulares e navegadores.
  */
 
-const CACHE_NAME = 'cards-dungeons-v1.2.0';
+const CACHE_NAME = 'cards-dungeons-v2.1.0-dark-fantasy-overhaul';
 
 const PRECACHE_ASSETS = [
   './',
@@ -67,36 +67,55 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Ignora requisições não-GET ou extensões do navegador
+  // Ignora requisições não-GET ou esquemas não-HTTP
   if (event.request.method !== 'GET') return;
   if (!event.request.url.startsWith('http')) return;
 
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Retorna do cache e atualiza em segundo plano (Stale-While-Revalidate)
-        fetch(event.request).then((networkResponse) => {
+  const url = new URL(event.request.url);
+  const isCodeOrDoc = event.request.mode === 'navigate' || 
+                      url.pathname.endsWith('.html') || 
+                      url.pathname.endsWith('.css') || 
+                      url.pathname.endsWith('.js') ||
+                      url.pathname.endsWith('/') ||
+                      url.search.includes('v=');
+
+  if (isCodeOrDoc) {
+    // Network-First para páginas e código: Garante atualizações imediatas em produção
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
           }
-        }).catch(() => {});
+          return networkResponse;
+        })
+        .catch(() => {
+          // Se estiver offline ou a rede falhar, utiliza a cópia do cache local
+          return caches.match(event.request, { ignoreSearch: true }).then((cached) => {
+            if (cached) return cached;
+            if (event.request.mode === 'navigate') {
+              return caches.match('./index.html');
+            }
+          });
+        })
+    );
+    return;
+  }
+
+  // Cache-First para imagens, áudios e outros assets estáticos
+  event.respondWith(
+    caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
+      if (cachedResponse) {
         return cachedResponse;
       }
-
       return fetch(event.request).then((networkResponse) => {
         if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
           return networkResponse;
         }
         const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
         return networkResponse;
-      }).catch(() => {
-        // Fallback offline para navegação
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
       });
     })
   );

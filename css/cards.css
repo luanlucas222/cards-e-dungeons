@@ -80,64 +80,118 @@
   opacity: 0.65;
 }
 
-/* 1. Ataque (Ferro Forjado Carmesim & Rubi Lapidado) */
+/* Gema de Soquete Lapidada no Topo da Carta (Como no Mockup TCG) */
+.card-socket-gem.card-gem-top {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 15px;
+  height: 15px;
+  border-radius: 2px;
+  z-index: 17;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.95);
+  pointer-events: none;
+}
+
+/* 1. Ataque (Ferro Forjado Carmesim com Rebites e Borda Chanfrada) */
 .game-card.card-attack {
-  border-color: #8c242c;
+  border: 4px solid #7f1d1d;
   background: 
-    radial-gradient(circle at 50% 20%, rgba(231, 76, 60, 0.22) 0%, transparent 68%),
-    linear-gradient(165deg, #2a1215 0%, #1a0b0d 60%, #0d0607 100%);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(140, 36, 44, 0.35);
+    radial-gradient(circle at 50% 25%, rgba(185, 28, 28, 0.35) 0%, transparent 70%),
+    linear-gradient(165deg, #2b1216 0%, #160a0c 60%, #0a0405 100%);
+  box-shadow: 
+    0 14px 32px rgba(0, 0, 0, 0.95), 
+    0 0 0 1px #450a0a,
+    inset 0 0 14px rgba(220, 38, 38, 0.35);
 }
 .game-card.card-attack::after {
-  border-color: rgba(231, 76, 60, 0.35);
-  box-shadow: inset 0 0 8px rgba(180, 40, 50, 0.25);
+  border-color: rgba(239, 68, 68, 0.45);
+}
+.game-card.card-attack .card-socket-gem.card-gem-top {
+  background: radial-gradient(circle at 35% 35%, #fca5a5 0%, #ef4444 60%, #7f1d1d 100%);
+  border-color: #fecaca;
+  box-shadow: 0 0 10px #ef4444, 0 0 16px rgba(239, 68, 68, 0.8);
 }
 @media (hover: hover) and (pointer: fine) {
   .game-card.card-attack:hover {
-    border-color: #ff5e62;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.9), 0 0 24px rgba(231, 76, 60, 0.6), inset 0 0 14px rgba(255, 94, 98, 0.3);
+    border-color: #ef4444;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.95), 0 0 26px rgba(239, 68, 68, 0.75), inset 0 0 18px rgba(255, 94, 98, 0.4);
   }
 }
 
-/* 2. Defesa (Aço Temperado Safira & Glifo de Proteção) */
+/* 2. Defesa (Placas de Aço Safira Temperado com Entalhes Rúnicos) */
 .game-card.card-defense {
-  border-color: #2364a8;
+  border: 4px solid #1e3a8a;
   background: 
-    radial-gradient(circle at 50% 20%, rgba(58, 145, 252, 0.22) 0%, transparent 68%),
-    linear-gradient(165deg, #122135 0%, #0a1420 60%, #050a10 100%);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(35, 100, 168, 0.35);
+    radial-gradient(circle at 50% 25%, rgba(29, 78, 216, 0.35) 0%, transparent 70%),
+    linear-gradient(165deg, #101e38 0%, #091224 60%, #040812 100%);
+  box-shadow: 
+    0 14px 32px rgba(0, 0, 0, 0.95), 
+    0 0 0 1px #0f172a,
+    inset 0 0 14px rgba(59, 130, 246, 0.35);
 }
 .game-card.card-defense::after {
-  border-color: rgba(58, 145, 252, 0.38);
-  box-shadow: inset 0 0 8px rgba(35, 100, 168, 0.25);
+  border-color: rgba(96, 165, 250, 0.45);
+}
+.game-card.card-defense .card-socket-gem.card-gem-top {
+  background: radial-gradient(circle at 35% 35%, #93c5fd 0%, #3b82f6 60%, #1e3a8a 100%);
+  border-color: #dbeafe;
+  box-shadow: 0 0 10px #3b82f6, 0 0 16px rgba(59, 130, 246, 0.8);
 }
 @media (hover: hover) and (pointer: fine) {
   .game-card.card-defense:hover {
     border-color: #60a5fa;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.9), 0 0 24px rgba(58, 145, 252, 0.6), inset 0 0 14px rgba(96, 165, 250, 0.3);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.95), 0 0 26px rgba(59, 130, 246, 0.75), inset 0 0 18px rgba(96, 165, 250, 0.4);
   }
 }
 
-/* 3. Especial / Habilidade (Filigrana Dourada & Éter Arcano) */
+/* 3. Especial / Habilidade (Filigrana Dourada Nobre & Éter Arcano) */
 .game-card.card-skill,
 .game-card.card-special {
-  border-color: #b58928;
+  border: 4px solid #b45309;
   background: 
-    radial-gradient(circle at 50% 20%, rgba(212, 175, 55, 0.24) 0%, transparent 68%),
-    linear-gradient(165deg, #2a2211 0%, #161208 60%, #0a0804 100%);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(181, 137, 40, 0.35);
+    radial-gradient(circle at 50% 25%, rgba(217, 119, 6, 0.35) 0%, transparent 70%),
+    linear-gradient(165deg, #2a1e0c 0%, #171006 60%, #0a0702 100%);
+  box-shadow: 
+    0 14px 32px rgba(0, 0, 0, 0.95), 
+    0 0 0 1px #78350f,
+    inset 0 0 14px rgba(245, 158, 11, 0.4);
 }
 .game-card.card-skill::after,
 .game-card.card-special::after {
-  border-color: rgba(250, 228, 140, 0.42);
-  box-shadow: inset 0 0 8px rgba(212, 175, 55, 0.25);
+  border-color: rgba(251, 191, 36, 0.5);
+}
+.game-card.card-skill .card-socket-gem.card-gem-top,
+.game-card.card-special .card-socket-gem.card-gem-top {
+  background: radial-gradient(circle at 35% 35%, #fde047 0%, #eab308 60%, #713f12 100%);
+  border-color: #fef08a;
+  box-shadow: 0 0 12px #eab308, 0 0 18px rgba(234, 179, 8, 0.8);
 }
 @media (hover: hover) and (pointer: fine) {
   .game-card.card-skill:hover,
   .game-card.card-special:hover {
-    border-color: #ffd700;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.9), 0 0 26px rgba(255, 215, 0, 0.65), inset 0 0 14px rgba(255, 215, 0, 0.35);
+    border-color: #facc15;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.95), 0 0 28px rgba(250, 204, 21, 0.8), inset 0 0 18px rgba(254, 240, 138, 0.45);
   }
+}
+
+/* 4. Cartas Aprimoradas (+): Ouro Solar Resplandecente */
+.game-card.is-upgraded {
+  border-color: #facc15 !important;
+  box-shadow: 
+    0 16px 36px rgba(0, 0, 0, 0.95), 
+    0 0 24px rgba(250, 204, 21, 0.6),
+    inset 0 0 16px rgba(254, 240, 138, 0.35) !important;
+}
+.game-card.is-upgraded::after {
+  border-color: #fef08a !important;
+}
+.game-card.is-upgraded .card-socket-gem.card-gem-top {
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fde047 50%, #ca8a04 100%) !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 0 16px #fde047, 0 0 25px rgba(255, 255, 255, 0.85) !important;
 }
 
 /* Feedback Tátil Imediato para Toque no Celular */
@@ -306,45 +360,50 @@
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
 }
 
-/* Cabeçalho da Carta (Título) */
+/* Cabeçalho da Carta (Título em Placa Entalhada) */
 .card-header {
-  padding-left: 20px;
   height: 24px;
+  margin-bottom: 4px;
+  padding: 0 4px 0 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  margin-bottom: 3px;
+  background: linear-gradient(180deg, rgba(28, 30, 42, 0.95) 0%, rgba(12, 14, 20, 0.98) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 4px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8), 0 2px 4px rgba(0, 0, 0, 0.6);
 }
 
 .card-title {
   font-family: var(--font-fantasy);
-  font-size: clamp(0.66rem, 0.82vw, 0.80rem);
-  font-weight: 800;
-  color: var(--text-gold);
-  letter-spacing: 0.3px;
+  font-size: clamp(0.66rem, 0.8vw, 0.78rem);
+  font-weight: 900;
+  color: #fef08a;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.8);
   -webkit-font-smoothing: antialiased;
 }
 
-/* Moldura da Ilustração Artística */
+/* Moldura da Ilustração Artística (Janela Gótica Arqueada) */
 .card-art-frame {
   flex: 1;
   width: 100%;
-  min-height: clamp(52px, 7vh, 80px);
-  max-height: clamp(68px, 9vh, 98px);
-  border-radius: 6px;
-  background: radial-gradient(circle at center, rgba(32, 36, 52, 0.95) 0%, rgba(12, 14, 20, 0.98) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  min-height: clamp(54px, 7.5vh, 82px);
+  max-height: clamp(70px, 9.5vh, 100px);
+  border-radius: 5px;
+  background: #08090d;
+  border: 2px solid #382c22;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   position: relative;
-  box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 4px 14px rgba(0, 0, 0, 0.95), 0 2px 6px rgba(0, 0, 0, 0.8);
 }
 
 .card-art-frame svg {
@@ -371,17 +430,18 @@
   transform: scale(1.12);
 }
 
-/* Faixa de Tipo da Carta */
+/* Faixa de Tipo da Carta (Fita Entalhada em Ouro e Obsidiana) */
 .card-type-banner {
   height: 20px;
-  margin: 5px 0;
-  border-radius: 3px;
-  background: rgba(10, 11, 16, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 4px 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(20, 22, 32, 0.95) 15%, rgba(36, 40, 58, 0.98) 50%, rgba(20, 22, 32, 0.95) 85%, transparent 100%);
+  border-top: 1px solid rgba(212, 175, 55, 0.4);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .card-type-label {
@@ -389,29 +449,29 @@
   font-size: 0.68rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
 }
 
-.card-attack .card-type-label { color: #ff7675; }
-.card-defense .card-type-label { color: #74b9ff; }
+.card-attack .card-type-label { color: #ff7675; text-shadow: 0 0 6px rgba(239, 68, 68, 0.6); }
+.card-defense .card-type-label { color: #74b9ff; text-shadow: 0 0 6px rgba(59, 130, 246, 0.6); }
 .card-skill .card-type-label,
-.card-special .card-type-label { color: var(--gold-light); }
+.card-special .card-type-label { color: var(--gold-light); text-shadow: 0 0 6px var(--gold-glow); }
 
-/* Caixa de Descrição / Texto de Efeito */
+/* Caixa de Descrição / Texto de Efeito (Papiro Escuro de Obsidiana) */
 .card-body {
   flex: 1 1 auto;
-  min-height: 60px;
+  min-height: 58px;
   max-height: 84px;
-  border-radius: 6px;
-  background: linear-gradient(180deg, rgba(14, 16, 24, 0.96) 0%, rgba(8, 9, 14, 0.98) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 4px 8px;
+  border-radius: 5px;
+  background: radial-gradient(circle at 50% 25%, #181924 0%, #0c0d13 100%);
+  border: 1.5px solid #2d3042;
+  padding: 5px 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   overflow: hidden;
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.85), 0 2px 6px rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.9), 0 2px 6px rgba(0, 0, 0, 0.6);
   box-sizing: border-box;
 }
 

@@ -9580,6 +9580,7 @@ class CardRenderer {
 
     cardEl.innerHTML = `
       <div class="card-glare"></div>
+      <div class="card-socket-gem card-gem-top"></div>
       <div class="card-cost" title="Custo de Energia">${card.cost}</div>
       <div class="card-header">
         <span class="card-title">${cleanTitle}${upgradeBadgeHtml}</span>
@@ -9587,7 +9588,9 @@ class CardRenderer {
       <div class="card-art-frame">
         ${artHtml}
       </div>
-      <div class="card-type-badge">${typeLabel}${rarityLabel && card.rarity !== 'starter' ? ` • ${rarityLabel}` : ''}</div>
+      <div class="card-type-banner card-type-badge">
+        <span class="card-type-label">${typeLabel}${rarityLabel && card.rarity !== 'starter' ? ` • ${rarityLabel}` : ''}</span>
+      </div>
       <div class="card-body">
         <p class="card-description">${formattedDesc}</p>
       </div>
@@ -10704,13 +10707,17 @@ class CombatRenderer {
     }
 
     // 1. Top Bar
+    const iconBadge = this.container.querySelector('.encounter-icon-badge');
+    if (iconBadge) {
+      iconBadge.textContent = enemy.type === 'boss' ? '👑' : (enemy.type === 'elite' ? '🐂' : '⚔️');
+    }
     if (this.encounterTitleEl) {
       if (enemy.type === 'boss') {
-        this.encounterTitleEl.textContent = '👑 Batalha Decisiva: ' + enemy.name;
+        this.encounterTitleEl.textContent = 'Batalha Decisiva: ' + enemy.name;
       } else if (enemy.type === 'elite') {
-        this.encounterTitleEl.textContent = '🐂 Batalha de Elite: ' + enemy.name;
+        this.encounterTitleEl.textContent = 'Inimigo de Elite: ' + enemy.name;
       } else {
-        this.encounterTitleEl.textContent = '⚔️ Combate: ' + enemy.name;
+        this.encounterTitleEl.textContent = 'Combate: ' + enemy.name;
       }
     }
     if (this.turnCounterEl) {

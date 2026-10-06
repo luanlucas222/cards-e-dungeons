@@ -138,13 +138,17 @@ export class CombatRenderer {
     }
 
     // 1. Top Bar
+    const iconBadge = this.container.querySelector('.encounter-icon-badge');
+    if (iconBadge) {
+      iconBadge.textContent = enemy.type === 'boss' ? '👑' : (enemy.type === 'elite' ? '🐂' : '⚔️');
+    }
     if (this.encounterTitleEl) {
       if (enemy.type === 'boss') {
-        this.encounterTitleEl.textContent = '👑 Batalha Decisiva: ' + enemy.name;
+        this.encounterTitleEl.textContent = 'Batalha Decisiva: ' + enemy.name;
       } else if (enemy.type === 'elite') {
-        this.encounterTitleEl.textContent = '🐂 Batalha de Elite: ' + enemy.name;
+        this.encounterTitleEl.textContent = 'Inimigo de Elite: ' + enemy.name;
       } else {
-        this.encounterTitleEl.textContent = '⚔️ Combate: ' + enemy.name;
+        this.encounterTitleEl.textContent = 'Combate: ' + enemy.name;
       }
     }
     if (this.turnCounterEl) {

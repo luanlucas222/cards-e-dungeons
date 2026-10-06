@@ -23,7 +23,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 30px;
+  padding: 8px 24px;
+  background: linear-gradient(180deg, rgba(8, 10, 16, 0.88) 0%, rgba(8, 10, 16, 0.5) 70%, transparent 100%);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.22);
   z-index: 10;
 }
 
@@ -58,7 +60,7 @@
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding: clamp(16px, 2.5vh, 28px) clamp(8px, 2vw, 36px);
+  padding: clamp(14px, 2vh, 26px) clamp(8px, 2vw, 36px);
   position: relative;
   max-width: 100%;
   margin: 0 auto;
@@ -85,6 +87,7 @@
   position: relative;
   width: clamp(130px, 22vw, 240px);
   flex-shrink: 0;
+  margin-top: 14px;
   transition: transform 0.2s ease;
 }
 
@@ -127,28 +130,12 @@
 }
 
 .combatant-avatar-frame {
-  width: clamp(96px, 15vw, 165px);
-  height: clamp(96px, 15vw, 165px);
-  border-radius: 50%;
-  position: relative;
-  background: radial-gradient(circle at 40% 40%, #252b3d 0%, #12141c 100%);
-  border: 3px solid var(--border-frame);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.8), 0 0 15px rgba(37, 116, 212, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: clamp(6px, 1.2vh, 12px);
-  overflow: hidden;
-  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.combatant-avatar-frame {
-  width: clamp(100px, 15vw, 160px);
-  height: clamp(100px, 15vw, 160px);
-  border-radius: 50%;
-  background: radial-gradient(circle, #1a1e2b 0%, #0d0f17 100%);
-  border: 3px solid #3d2b1f;
-  outline: 2px solid #d4af37;
+  width: clamp(105px, 15vw, 168px);
+  height: clamp(118px, 17vw, 185px);
+  border-radius: 28px 28px 14px 14px;
+  background: radial-gradient(circle at 45% 40%, #1a1e2b 0%, #0d0f17 100%);
+  border: 4px solid #3d2b1f;
+  outline: 2px solid #b45309;
   outline-offset: -5px;
   position: relative;
   display: flex;
@@ -157,27 +144,28 @@
   margin-bottom: clamp(6px, 1.2vh, 12px);
   overflow: visible;
   transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.95), 0 0 25px rgba(212, 175, 55, 0.35);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.95), 0 0 25px rgba(212, 175, 55, 0.35), inset 0 0 15px rgba(0, 0, 0, 0.85);
 }
 
 .hero-combatant .combatant-avatar-frame {
   border-color: #1e3a5f;
   outline-color: #60a5fa;
-  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.95), 0 0 25px rgba(59, 130, 246, 0.45);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.95), 0 0 25px rgba(59, 130, 246, 0.45);
 }
 
+/* Gema-Coroa Entalhada no Topo do Medallhão do Herói */
 .hero-combatant .combatant-avatar-frame::before {
   content: '';
   position: absolute;
-  top: -8px;
+  top: -11px;
   left: 50%;
-  transform: translateX(-50%);
-  width: 16px;
-  height: 16px;
-  background: radial-gradient(circle at 35% 35%, #93c5fd 0%, #3b82f6 60%, #1e3a8a 100%);
-  border: 1.5px solid #dbeafe;
-  border-radius: 50%;
-  box-shadow: 0 0 12px #60a5fa;
+  transform: translateX(-50%) rotate(45deg);
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle at 35% 35%, #bfdbfe 0%, #3b82f6 50%, #1e3a8a 100%);
+  border: 2px solid #dbeafe;
+  border-radius: 3px;
+  box-shadow: 0 0 14px #60a5fa, 0 4px 8px rgba(0, 0, 0, 0.9);
   z-index: 10;
 }
 
@@ -194,7 +182,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 50%;
+  border-radius: 24px 24px 10px 10px;
   display: block;
   transition: transform 0.3s ease, filter 0.3s ease;
 }
@@ -212,35 +200,45 @@
 .enemy-combatant .combatant-avatar-frame {
   border-color: #4a151b;
   outline-color: #f87171;
-  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.95), 0 0 25px rgba(239, 68, 68, 0.45);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.95), 0 0 25px rgba(239, 68, 68, 0.45);
 }
 
+/* Gema-Coroa Carmesim no Medallhão do Monstro */
 .enemy-combatant .combatant-avatar-frame::before {
   content: '';
   position: absolute;
-  top: -8px;
+  top: -11px;
   left: 50%;
-  transform: translateX(-50%);
-  width: 16px;
-  height: 16px;
-  background: radial-gradient(circle at 35% 35%, #fca5a5 0%, #ef4444 60%, #7f1d1d 100%);
-  border: 1.5px solid #fee2e2;
-  border-radius: 50%;
-  box-shadow: 0 0 12px #ef4444;
+  transform: translateX(-50%) rotate(45deg);
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle at 35% 35%, #fecaca 0%, #ef4444 50%, #7f1d1d 100%);
+  border: 2px solid #fee2e2;
+  border-radius: 3px;
+  box-shadow: 0 0 14px #ef4444, 0 4px 8px rgba(0, 0, 0, 0.9);
   z-index: 10;
 }
 
 /* Destaque para o Chefe Dragão */
 .enemy-combatant.is-boss .combatant-avatar-frame {
-  width: clamp(130px, 21vw, 220px);
-  height: clamp(130px, 21vw, 220px);
+  width: clamp(135px, 22vw, 225px);
+  height: clamp(145px, 23vw, 240px);
   border-color: var(--gold-primary);
   outline-color: #fbbf24;
   box-shadow: 
-    0 16px 40px rgba(0, 0, 0, 0.95), 
+    0 18px 45px rgba(0, 0, 0, 0.98), 
     0 0 35px rgba(239, 68, 68, 0.7),
     0 0 25px var(--gold-glow);
   animation: dragonPulse 3.5s infinite ease-in-out;
+}
+
+.enemy-combatant.is-boss .combatant-avatar-frame::before {
+  width: 24px;
+  height: 24px;
+  top: -13px;
+  background: radial-gradient(circle at 35% 35%, #fef08a 0%, #eab308 45%, #b91c1c 100%);
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 20px #eab308, 0 0 32px #ef4444;
 }
 
 .enemy-combatant.is-boss .combatant-avatar-frame svg {
@@ -398,13 +396,15 @@
 
 .hp-bar {
   width: 100%;
-  height: 18px;
-  background: #0c0e14;
+  height: 22px;
+  background: #080a10;
   border-radius: 4px;
-  border: 1.5px solid #4a3828;
+  border: 2px solid #4a3425;
+  outline: 1px solid rgba(212, 175, 55, 0.4);
+  outline-offset: -2px;
   overflow: hidden;
   position: relative;
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9), 0 2px 8px rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.95), 0 3px 8px rgba(0, 0, 0, 0.7);
 }
 
 .hp-bar-bleed {
@@ -412,7 +412,7 @@
   top: 0;
   left: 0;
   bottom: 0;
-  background: linear-gradient(90deg, #b91c1c 0%, #ea580c 50%, #f59e0b 100%);
+  background: linear-gradient(180deg, #ea580c 0%, #c2410c 50%, #7c2d12 100%);
   transition: width 0.65s cubic-bezier(0.2, 0.8, 0.2, 1);
   z-index: 1;
   box-shadow: 0 0 10px rgba(245, 158, 11, 0.7);
@@ -423,10 +423,10 @@
   top: 0;
   left: 0;
   bottom: 0;
-  background: linear-gradient(90deg, #7f1d1d 0%, #b91c1c 50%, #ef4444 100%);
+  background: linear-gradient(180deg, #ef4444 0%, #dc2626 50%, #7f1d1d 100%);
   transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 2;
-  box-shadow: 0 0 12px rgba(239, 68, 68, 0.7);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.85);
 }
 
 .hp-text {
@@ -435,34 +435,37 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-ui);
-  font-size: 0.78rem;
-  font-weight: 800;
+  font-family: var(--font-fantasy);
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.8px;
   color: #ffffff;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+  text-shadow: 0 2px 4px #000000, 0 0 8px rgba(0, 0, 0, 0.95);
   pointer-events: none;
   z-index: 5;
 }
 
-/* Escudo / Armadura Badge */
+/* Escudo / Armadura Badge (Escudo Gótico de Safira) */
 .armor-badge {
   position: absolute;
-  left: -12px;
+  left: -14px;
   top: 50%;
   transform: translateY(-50%);
-  background: radial-gradient(circle, #2574d4 0%, #103460 100%);
-  border: 1.5px solid #74b9ff;
+  background: radial-gradient(circle at 35% 35%, #3b82f6 0%, #1d4ed8 60%, #0f172a 100%);
+  border: 2px solid #93c5fd;
+  outline: 1px solid #1e3a8a;
+  outline-offset: -3px;
   border-radius: 50%;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
   font-family: var(--font-fantasy);
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 900;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), 0 0 10px var(--sapphire-glow);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.9), 0 0 14px #3b82f6;
   z-index: 6;
   opacity: 0;
   pointer-events: none;
@@ -475,49 +478,56 @@
   transform: translateY(-50%) scale(1);
 }
 
-/* Orbes Mágicos de Energia com Líquido Pulsante Arcana */
+/* Orbes Mágicos de Energia Montados em Pedestal de Latão Arcana */
 .energy-container {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
   margin-top: 10px;
+  background: radial-gradient(ellipse at 50% 50%, rgba(20, 26, 44, 0.95) 0%, rgba(10, 12, 18, 0.98) 100%);
+  border: 2px solid #78350f;
+  outline: 1px solid #d4af37;
+  outline-offset: -3px;
+  border-radius: 20px;
+  padding: 5px 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.9), 0 0 16px rgba(212, 175, 55, 0.25), inset 0 2px 6px rgba(0, 0, 0, 0.8);
 }
 
 .energy-orbs-group {
   display: flex;
   flex-direction: row;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
 }
 
 .energy-orb {
-  width: 26px;
-  height: 26px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   position: relative;
   overflow: hidden;
-  background: radial-gradient(circle at 35% 35%, #00d2d3 0%, #0984e3 50%, #0c2461 100%);
-  border: 2px solid #74b9ff;
-  box-shadow: 0 0 16px rgba(9, 132, 227, 0.85), inset 0 0 8px rgba(255, 255, 255, 0.5);
+  background: radial-gradient(circle at 35% 30%, #a5f3fc 0%, #06b6d4 35%, #0284c7 70%, #082f49 100%);
+  border: 2px solid #bae6fd;
+  box-shadow: 0 0 16px #06b6d4, inset 0 0 10px #e0f2fe;
   transition: transform 0.25s, opacity 0.25s, filter 0.25s;
 }
 
 .energy-orb .orb-liquid {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 60%, rgba(9, 132, 227, 0.95) 0%, rgba(0, 210, 211, 0.65) 100%);
+  background: radial-gradient(circle at 50% 60%, rgba(6, 182, 212, 0.95) 0%, rgba(2, 132, 199, 0.7) 100%);
   animation: manaPulse 2.4s infinite ease-in-out;
 }
 
 .energy-orb .orb-glint {
   position: absolute;
   top: 3px;
-  left: 5px;
-  width: 6px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.85);
+  left: 6px;
+  width: 7px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 50%;
   transform: rotate(-30deg);
 }
@@ -535,21 +545,21 @@
 }
 
 .energy-orb.spent {
-  background: #14161f;
-  border-color: #2c3144;
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
-  opacity: 0.45;
-  filter: grayscale(0.8);
-  transform: scale(0.88);
+  background: #141724;
+  border-color: #2b3046;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9);
+  opacity: 0.35;
+  filter: grayscale(0.9);
+  transform: scale(0.85);
 }
 
 .energy-text {
   font-family: var(--font-fantasy);
-  font-weight: 800;
-  font-size: 0.95rem;
-  color: #74b9ff;
-  letter-spacing: 0.5px;
-  text-shadow: 0 0 8px rgba(116, 185, 255, 0.6);
+  font-weight: 900;
+  font-size: 1.05rem;
+  color: #bae6fd;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px #38bdf8, 0 2px 4px rgba(0, 0, 0, 0.95);
 }
 
 /* ==========================================================================
@@ -716,44 +726,55 @@
 }
 
 .pile-visual {
-  width: 54px;
-  height: 76px;
-  border-radius: 6px;
-  background: linear-gradient(145deg, #42281d 0%, #291811 50%, #150c08 100%);
-  border: 1.5px solid #c99e32;
+  width: 58px;
+  height: 80px;
+  border-radius: 3px 8px 8px 3px;
+  background: 
+    linear-gradient(90deg, #1c0e07 0%, #2a160c 8%, #4a2815 15%, #2a160c 25%, #3a1e10 85%, #1f1008 100%);
+  border: 2px solid #78350f;
+  outline: 1px solid #d4af37;
+  outline-offset: -3px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.85), inset 0 0 10px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.95), inset -2px 0 6px rgba(0, 0, 0, 0.8);
 }
 
+/* Lombada de Couro e Cantoneiras de Latão do Grimório */
 .pile-visual::before {
   content: '';
   position: absolute;
-  top: 3px;
-  left: 3px;
-  right: 3px;
-  bottom: 3px;
-  border-radius: 4px;
-  border: 1px solid rgba(212, 175, 55, 0.4);
+  top: 4px;
+  left: 8px;
+  right: 4px;
+  bottom: 4px;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: 2px 5px 5px 2px;
   pointer-events: none;
 }
 
 .card-pile:hover .pile-visual {
   border-color: #fce881;
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.9), 0 0 16px var(--gold-glow);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.95), 0 0 18px var(--gold-glow);
 }
 
 .pile-count-badge {
-  background: rgba(14, 15, 22, 0.95);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-round);
-  padding: 2px 8px;
+  background: radial-gradient(circle at 35% 35%, #fbbf24 0%, #d97706 65%, #78350f 100%);
+  border: 2px solid #fef08a;
+  border-radius: 50%;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-fantasy);
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--text-gold);
+  font-size: 0.92rem;
+  font-weight: 900;
+  color: #1a0f02;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.9), 0 0 12px rgba(251, 191, 36, 0.6);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .pile-label {
@@ -837,50 +858,88 @@
 }
 
 .btn-end-turn {
-  padding: 12px 24px;
+  padding: 13px 26px;
   font-size: 1.05rem;
   border-radius: 6px;
-  background: linear-gradient(180deg, #fae48c 0%, #d4af37 40%, #b89124 75%, #785a07 100%);
-  color: #0b0c10;
-  border: 2px solid #fae48c;
-  outline: 1.5px solid rgba(255, 255, 255, 0.4);
-  outline-offset: -3.5px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.9), 0 0 24px rgba(212, 175, 55, 0.65), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  background: radial-gradient(ellipse at 50% 20%, #fef08a 0%, #eab308 40%, #a16207 75%, #451a03 100%);
+  color: #1c0e00;
+  border: 3px solid #fef08a;
+  outline: 2px solid #713f12;
+  outline-offset: -5px;
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.95), 
+    0 0 25px rgba(234, 179, 8, 0.7), 
+    inset 0 2px 3px rgba(255, 255, 255, 0.85);
   font-family: var(--font-fantasy);
   font-weight: 900;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.8px;
   text-transform: uppercase;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s, filter 0.2s;
+}
+
+.btn-end-turn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+  transform: rotate(25deg);
+  animation: endTurnGleam 4s infinite ease-in-out;
+  pointer-events: none;
+}
+
+@keyframes endTurnGleam {
+  0%, 70% { left: -60%; }
+  85%, 100% { left: 140%; }
 }
 
 .btn-subtext {
   font-family: var(--font-ui);
   font-size: 0.68rem;
-  font-weight: 700;
-  color: rgba(11, 12, 16, 0.75);
+  font-weight: 800;
+  color: #3b1d06;
   letter-spacing: 0.5px;
   margin-top: 2px;
+  text-shadow: none;
 }
 
 .btn-end-turn:hover:not(:disabled) {
-  transform: translateY(-3px) scale(1.02);
-  background: linear-gradient(180deg, #fff2a3 0%, #fae48c 35%, #d4af37 70%, #99781d 100%);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.95), 0 0 35px var(--gold-glow);
-  filter: brightness(1.12);
+  transform: translateY(-3px) scale(1.03);
+  background: radial-gradient(ellipse at 50% 20%, #ffffff 0%, #fef08a 35%, #eab308 65%, #713f12 100%);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.95), 0 0 35px rgba(250, 204, 21, 0.9), inset 0 2px 4px #ffffff;
+  filter: brightness(1.1);
+}
+
+.btn-end-turn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.95), 0 0 18px rgba(234, 179, 8, 0.6);
 }
 
 .btn-end-turn:disabled {
   background: #252838;
   color: #63677d;
   border-color: #3b3f54;
+  outline-color: #1a1c27;
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
+}
+
+.btn-end-turn:disabled::after {
+  display: none;
+}
+
+.btn-end-turn:disabled .btn-subtext {
+  color: #52566b;
 }
 
 /* Efeitos Visuais de Impacto (Floating Combat Numbers & Física Balística) */

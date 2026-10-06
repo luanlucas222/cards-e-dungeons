@@ -267,6 +267,7 @@ export class CardRenderer {
 
     cardEl.innerHTML = `
       <div class="card-glare"></div>
+      <div class="card-socket-gem card-gem-top"></div>
       <div class="card-cost" title="Custo de Energia">${card.cost}</div>
       <div class="card-header">
         <span class="card-title">${cleanTitle}${upgradeBadgeHtml}</span>
@@ -274,7 +275,9 @@ export class CardRenderer {
       <div class="card-art-frame">
         ${artHtml}
       </div>
-      <div class="card-type-badge">${typeLabel}${rarityLabel && card.rarity !== 'starter' ? ` • ${rarityLabel}` : ''}</div>
+      <div class="card-type-banner card-type-badge">
+        <span class="card-type-label">${typeLabel}${rarityLabel && card.rarity !== 'starter' ? ` • ${rarityLabel}` : ''}</span>
+      </div>
       <div class="card-body">
         <p class="card-description">${formattedDesc}</p>
       </div>
