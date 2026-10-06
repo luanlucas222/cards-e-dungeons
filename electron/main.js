@@ -33,10 +33,6 @@ function createWindow() {
       win.setFullScreen(!win.isFullScreen());
       event.preventDefault();
     }
-    // Impede o recarregamento acidental por F5 ou Ctrl+R em produção
-    if ((input.key === 'F5' || (input.control && input.key.toLowerCase() === 'r')) && process.env.NODE_ENV !== 'development') {
-      event.preventDefault();
-    }
   });
 }
 
