@@ -9579,6 +9579,7 @@ class CardRenderer {
     const upgradeBadgeHtml = isUpgraded ? '<span class="upgraded-badge">+</span>' : '';
 
     cardEl.innerHTML = `
+      <div class="card-glare"></div>
       <div class="card-cost" title="Custo de Energia">${card.cost}</div>
       <div class="card-header">
         <span class="card-title">${cleanTitle}${upgradeBadgeHtml}</span>
@@ -9591,6 +9592,9 @@ class CardRenderer {
         <p class="card-description">${formattedDesc}</p>
       </div>
     `;
+
+    // Ativa inclinação tátil 3D e reflexo dinâmico de luz
+    CardRenderer.setupCardTilt(cardEl);
 
     // Interações de Mouse e Toque
     if (onHover) {
@@ -9608,6 +9612,84 @@ class CardRenderer {
     }
 
     return cardEl;
+  }
+
+  /**
+   * Configura inclinação 3D tátil (3D Tilt) e reflexo dinâmico de luz
+   */
+  static setupCardTilt(cardEl) {
+    if (!cardEl || typeof cardEl.addEventListener !== 'function') return;
+
+    let isHovered = false;
+    let rafId = null;
+
+    const handleMove = (clientX, clientY) => {
+      if (!isHovered || (cardEl.classList && cardEl.classList.contains('disabled'))) return;
+      if (typeof cardEl.getBoundingClientRect !== 'function') return;
+      const rect = cardEl.getBoundingClientRect();
+      if (!rect || rect.width === 0 || rect.height === 0) return;
+
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const rotateX = Math.max(-9, Math.min(9, ((y - centerY) / centerY) * -9));
+      const rotateY = Math.max(-9, Math.min(9, ((x - centerX) / centerX) * 9));
+      const glareX = Math.max(0, Math.min(100, (x / rect.width) * 100));
+      const glareY = Math.max(0, Math.min(100, (y / rect.height) * 100));
+
+      if (cardEl.style) {
+        cardEl.style.setProperty('--glare-x', `${glareX.toFixed(1)}%`);
+        cardEl.style.setProperty('--glare-y', `${glareY.toFixed(1)}%`);
+        cardEl.style.transform = `perspective(800px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-10px) scale(1.05)`;
+      }
+    };
+
+    cardEl.addEventListener('mouseenter', () => {
+      isHovered = true;
+    });
+
+    cardEl.addEventListener('mousemove', (e) => {
+      if (typeof requestAnimationFrame === 'function') {
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => handleMove(e.clientX, e.clientY));
+      } else {
+        handleMove(e.clientX, e.clientY);
+      }
+    });
+
+    cardEl.addEventListener('mouseleave', () => {
+      isHovered = false;
+      if (rafId && typeof cancelAnimationFrame === 'function') cancelAnimationFrame(rafId);
+      if (cardEl.style) {
+        cardEl.style.transform = '';
+        cardEl.style.removeProperty('--glare-x');
+        cardEl.style.removeProperty('--glare-y');
+      }
+    });
+  }
+
+  /**
+   * Renderiza o verso colecionável da carta (pedra rúnica e dragão em relevo)
+   */
+  static renderCardBack(customClass = '') {
+    let backEl;
+    if (typeof document !== 'undefined') {
+      backEl = document.createElement('div');
+    } else {
+      backEl = { className: '', setAttribute: () => {}, innerHTML: '' };
+    }
+    backEl.className = `game-card card-back ${customClass}`.trim();
+    const assets = (typeof window !== 'undefined' && window.GameAssets) || {};
+    const dragonSvg = (assets.SVGS && assets.SVGS.dragon) || '<svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>';
+    backEl.innerHTML = `
+      <div class="card-glare"></div>
+      <div class="card-back-emblem">
+        ${dragonSvg}
+      </div>
+    `;
+    return backEl;
   }
 
   /**
@@ -9925,6 +10007,7 @@ class CombatFx {
     this.particles = [];
     this.slashes = [];
     this.shockwaves = [];
+    this.embers = [];
     this.isRunning = false;
     this.rafId = null;
 
@@ -10202,6 +10285,36 @@ class CombatFx {
     this._startLoop();
   }
 
+  /**
+   * 6. BRASAS AMBIENTAIS INCANDESCENTES (Ambient Torch Embers)
+   */
+  startAmbientEmbers(count = 22) {
+    if (this.embers && this.embers.length > 0) return;
+    this.embers = [];
+    const colors = ['#f59e0b', '#d97706', '#ef4444', '#fbbf24', '#ff7849'];
+    const w = this.width || 600;
+    const h = this.height || 400;
+
+    for (let i = 0; i < count; i++) {
+      this.embers.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: -0.35 - Math.random() * 0.55,
+        size: 1.2 + Math.random() * 1.8,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        alpha: 0.15 + Math.random() * 0.55,
+        pulsePhase: Math.random() * Math.PI * 2,
+        pulseSpeed: 0.02 + Math.random() * 0.03
+      });
+    }
+    this._startLoop();
+  }
+
+  stopAmbientEmbers() {
+    this.embers = [];
+  }
+
   _startLoop() {
     if (this.isRunning) return;
     this.isRunning = true;
@@ -10217,8 +10330,9 @@ class CombatFx {
     const hasSlashes = this.slashes.length > 0;
     const hasShockwaves = this.shockwaves.length > 0;
     const hasParticles = this.particles.length > 0;
+    const hasEmbers = this.embers && this.embers.length > 0;
 
-    if (!hasSlashes && !hasShockwaves && !hasParticles) {
+    if (!hasSlashes && !hasShockwaves && !hasParticles && !hasEmbers) {
       this.isRunning = false;
       if (this.ctx) {
         this.ctx.clearRect(0, 0, this.width, this.height);
@@ -10230,6 +10344,22 @@ class CombatFx {
   }
 
   _update() {
+    // 0. Atualiza brasas ambientais contínuas de tocha
+    if (this.embers && this.embers.length > 0) {
+      const w = this.width || 600;
+      const h = this.height || 400;
+      for (let i = 0; i < this.embers.length; i++) {
+        const e = this.embers[i];
+        e.x += e.vx;
+        e.y += e.vy;
+        e.pulsePhase += e.pulseSpeed;
+        if (e.y < -10) {
+          e.y = h + 10;
+          e.x = Math.random() * w;
+        }
+      }
+    }
+
     // Limita máximo de partículas e efeitos simultâneos para evitar engasgos no mobile
     if (this.particles.length > 50) {
       this.particles.splice(0, this.particles.length - 50);
@@ -10293,6 +10423,20 @@ class CombatFx {
   _render() {
     if (!this.ctx) return;
     this.ctx.clearRect(0, 0, this.width, this.height);
+
+    // 0. Renderiza Brasas Ambientais de Tocha (Ambient Torch Embers)
+    if (this.embers && this.embers.length > 0) {
+      this.ctx.save();
+      for (const e of this.embers) {
+        const dynamicAlpha = Math.max(0.08, e.alpha * (0.7 + Math.sin(e.pulsePhase) * 0.3));
+        this.ctx.globalAlpha = dynamicAlpha;
+        this.ctx.fillStyle = e.color;
+        this.ctx.beginPath();
+        this.ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+      this.ctx.restore();
+    }
 
     // 1. Renderiza ondas de choque (Shield Wave - Zero Blur Dual Stroke)
     this.ctx.save();
@@ -10410,6 +10554,7 @@ class CombatFx {
   }
 
   destroy() {
+    this.stopAmbientEmbers();
     window.removeEventListener('resize', this._resizeHandler);
     if (this.rafId) {
       cancelAnimationFrame(this.rafId);
@@ -10456,6 +10601,7 @@ class CombatRenderer {
     this.heroAvatarEl = this.container.querySelector('#hero-avatar-box');
     this.heroNameEl = this.container.querySelector('#hero-name') || this.container.querySelector('.hero-combatant .combatant-name');
     this.heroHpBarFill = this.container.querySelector('#hero-hp-bar-fill');
+    this.heroHpBarBleed = this.container.querySelector('#hero-hp-bar-bleed');
     this.heroHpText = this.container.querySelector('#hero-hp-text');
     this.heroArmorBadge = this.container.querySelector('#hero-armor-badge');
     this.heroEnergyOrbs = this.container.querySelector('#hero-energy-orbs');
@@ -10467,6 +10613,7 @@ class CombatRenderer {
     this.enemyAvatarEl = this.container.querySelector('#enemy-avatar-box');
     this.enemyNameEl = this.container.querySelector('#enemy-name');
     this.enemyHpBarFill = this.container.querySelector('#enemy-hp-bar-fill');
+    this.enemyHpBarBleed = this.container.querySelector('#enemy-hp-bar-bleed');
     this.enemyHpText = this.container.querySelector('#enemy-hp-text');
     this.enemyArmorBadge = this.container.querySelector('#enemy-armor-badge');
     this.enemyIntentEl = this.container.querySelector('#enemy-intent-bubble');
@@ -10517,6 +10664,7 @@ class CombatRenderer {
     this.hasHandledCombatEnd = false;
     if (this.combatFx) {
       this.combatFx.resize();
+      this.combatFx.startAmbientEmbers(22);
     }
     this.renderCombatState();
     this._playSound('playCardDraw');
@@ -10590,10 +10738,15 @@ class CombatRenderer {
       `;
     }
 
-    // Vida do Herói
+    // Vida do Herói com animação de sangramento (damage bleed)
     const heroHpPct = Math.max(0, Math.min(100, (hero.hp / hero.maxHp) * 100));
     if (this.heroHpBarFill) {
       this.heroHpBarFill.style.width = `${heroHpPct}%`;
+    }
+    if (this.heroHpBarBleed) {
+      setTimeout(() => {
+        if (this.heroHpBarBleed) this.heroHpBarBleed.style.width = `${heroHpPct}%`;
+      }, 350);
     }
     if (this.heroHpText) {
       this.heroHpText.textContent = `${hero.hp} / ${hero.maxHp}`;
@@ -10610,12 +10763,14 @@ class CombatRenderer {
       }
     }
 
-    // Orbes de Energia
+    // Orbes Mágicos de Energia com Líquido Pulsante Arcana
     if (this.heroEnergyOrbs) {
       this.heroEnergyOrbs.innerHTML = '';
       for (let i = 0; i < hero.maxEnergy; i++) {
+        const isSpent = i >= hero.energy;
         const orb = document.createElement('div');
-        orb.className = `energy-orb ${i < hero.energy ? '' : 'spent'}`;
+        orb.className = `energy-orb ${isSpent ? 'spent' : 'active'}`;
+        orb.innerHTML = '<span class="orb-liquid"></span><span class="orb-glint"></span>';
         this.heroEnergyOrbs.appendChild(orb);
       }
     }
@@ -10674,10 +10829,15 @@ class CombatRenderer {
       }
     }
 
-    // Vida do Inimigo
+    // Vida do Inimigo com animação de sangramento (damage bleed)
     const enemyHpPct = Math.max(0, Math.min(100, (enemy.hp / enemy.maxHp) * 100));
     if (this.enemyHpBarFill) {
       this.enemyHpBarFill.style.width = `${enemyHpPct}%`;
+    }
+    if (this.enemyHpBarBleed) {
+      setTimeout(() => {
+        if (this.enemyHpBarBleed) this.enemyHpBarBleed.style.width = `${enemyHpPct}%`;
+      }, 350);
     }
     if (this.enemyHpText) {
       this.enemyHpText.textContent = `${enemy.hp} / ${enemy.maxHp}`;
@@ -11084,25 +11244,34 @@ class CombatRenderer {
   handleCombatEnd(result) {
     if (this.hasHandledCombatEnd) return;
     this.hasHandledCombatEnd = true;
+    if (this.combatFx) {
+      this.combatFx.stopAmbientEmbers();
+    }
     if (this.onCombatEnd) {
       this.onCombatEnd(result);
     }
   }
 
   /**
-   * Exibe números flutuantes animados de dano, armadura ou cura
+   * Exibe números flutuantes animados de dano, armadura ou cura com física balística
    */
   showFloatingNumber(targetEl, text, type = 'damage') {
-    if (!targetEl) return;
+    if (!targetEl || !this.combatStageEl) return;
+
+    const parsedNum = parseInt(String(text).replace(/[^0-9]/g, ''), 10);
+    const isCrit = type === 'crit' || (type === 'damage' && !isNaN(parsedNum) && parsedNum >= 14);
+    const effectiveType = isCrit ? 'crit' : type;
+    const arcSide = Math.random() > 0.5 ? 'float-arc-right' : 'float-arc-left';
 
     const numEl = document.createElement('div');
-    numEl.className = `floating-number floating-${type}`;
+    numEl.className = `floating-number floating-${effectiveType} ${arcSide}`;
     numEl.textContent = text;
 
     const rect = targetEl.getBoundingClientRect();
     const stageRect = this.combatStageEl.getBoundingClientRect();
 
-    const posX = rect.left - stageRect.left + rect.width / 2 - 25;
+    const randomOffsetX = (Math.random() * 26 - 13);
+    const posX = rect.left - stageRect.left + rect.width / 2 - 25 + randomOffsetX;
     const posY = rect.top - stageRect.top + rect.height / 3;
 
     numEl.style.left = `${posX}px`;
@@ -11112,21 +11281,22 @@ class CombatRenderer {
 
     setTimeout(() => {
       numEl.remove();
-    }, 900);
+    }, 950);
   }
 
   /**
-   * Efeito de tremor de tela (Screenshake)
+   * Efeito de tremor de tela (Screenshake com intensidade normal ou pesada)
    */
-  triggerScreenShake() {
+  triggerScreenShake(intensity = 'normal') {
     const appEl = document.getElementById('app') || document.body;
-    appEl.classList.remove('shake-screen');
+    appEl.classList.remove('shake-screen', 'shake-screen-heavy');
     void appEl.offsetWidth;
-    appEl.classList.add('shake-screen');
+    const shakeClass = intensity === 'heavy' ? 'shake-screen-heavy' : 'shake-screen';
+    appEl.classList.add(shakeClass);
 
     setTimeout(() => {
-      appEl.classList.remove('shake-screen');
-    }, 380);
+      appEl.classList.remove('shake-screen', 'shake-screen-heavy');
+    }, intensity === 'heavy' ? 440 : 350);
   }
 
   /**

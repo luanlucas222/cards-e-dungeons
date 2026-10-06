@@ -35,6 +35,7 @@ export class CombatRenderer {
     this.heroAvatarEl = this.container.querySelector('#hero-avatar-box');
     this.heroNameEl = this.container.querySelector('#hero-name') || this.container.querySelector('.hero-combatant .combatant-name');
     this.heroHpBarFill = this.container.querySelector('#hero-hp-bar-fill');
+    this.heroHpBarBleed = this.container.querySelector('#hero-hp-bar-bleed');
     this.heroHpText = this.container.querySelector('#hero-hp-text');
     this.heroArmorBadge = this.container.querySelector('#hero-armor-badge');
     this.heroEnergyOrbs = this.container.querySelector('#hero-energy-orbs');
@@ -46,6 +47,7 @@ export class CombatRenderer {
     this.enemyAvatarEl = this.container.querySelector('#enemy-avatar-box');
     this.enemyNameEl = this.container.querySelector('#enemy-name');
     this.enemyHpBarFill = this.container.querySelector('#enemy-hp-bar-fill');
+    this.enemyHpBarBleed = this.container.querySelector('#enemy-hp-bar-bleed');
     this.enemyHpText = this.container.querySelector('#enemy-hp-text');
     this.enemyArmorBadge = this.container.querySelector('#enemy-armor-badge');
     this.enemyIntentEl = this.container.querySelector('#enemy-intent-bubble');
@@ -96,6 +98,7 @@ export class CombatRenderer {
     this.hasHandledCombatEnd = false;
     if (this.combatFx) {
       this.combatFx.resize();
+      this.combatFx.startAmbientEmbers(22);
     }
     this.renderCombatState();
     this._playSound('playCardDraw');
@@ -169,10 +172,15 @@ export class CombatRenderer {
       `;
     }
 
-    // Vida do Herói
+    // Vida do Herói com animação de sangramento (damage bleed)
     const heroHpPct = Math.max(0, Math.min(100, (hero.hp / hero.maxHp) * 100));
     if (this.heroHpBarFill) {
       this.heroHpBarFill.style.width = `${heroHpPct}%`;
+    }
+    if (this.heroHpBarBleed) {
+      setTimeout(() => {
+        if (this.heroHpBarBleed) this.heroHpBarBleed.style.width = `${heroHpPct}%`;
+      }, 350);
     }
     if (this.heroHpText) {
       this.heroHpText.textContent = `${hero.hp} / ${hero.maxHp}`;
@@ -189,12 +197,14 @@ export class CombatRenderer {
       }
     }
 
-    // Orbes de Energia
+    // Orbes Mágicos de Energia com Líquido Pulsante Arcana
     if (this.heroEnergyOrbs) {
       this.heroEnergyOrbs.innerHTML = '';
       for (let i = 0; i < hero.maxEnergy; i++) {
+        const isSpent = i >= hero.energy;
         const orb = document.createElement('div');
-        orb.className = `energy-orb ${i < hero.energy ? '' : 'spent'}`;
+        orb.className = `energy-orb ${isSpent ? 'spent' : 'active'}`;
+        orb.innerHTML = '<span class="orb-liquid"></span><span class="orb-glint"></span>';
         this.heroEnergyOrbs.appendChild(orb);
       }
     }
@@ -253,10 +263,15 @@ export class CombatRenderer {
       }
     }
 
-    // Vida do Inimigo
+    // Vida do Inimigo com animação de sangramento (damage bleed)
     const enemyHpPct = Math.max(0, Math.min(100, (enemy.hp / enemy.maxHp) * 100));
     if (this.enemyHpBarFill) {
       this.enemyHpBarFill.style.width = `${enemyHpPct}%`;
+    }
+    if (this.enemyHpBarBleed) {
+      setTimeout(() => {
+        if (this.enemyHpBarBleed) this.enemyHpBarBleed.style.width = `${enemyHpPct}%`;
+      }, 350);
     }
     if (this.enemyHpText) {
       this.enemyHpText.textContent = `${enemy.hp} / ${enemy.maxHp}`;
@@ -663,25 +678,34 @@ export class CombatRenderer {
   handleCombatEnd(result) {
     if (this.hasHandledCombatEnd) return;
     this.hasHandledCombatEnd = true;
+    if (this.combatFx) {
+      this.combatFx.stopAmbientEmbers();
+    }
     if (this.onCombatEnd) {
       this.onCombatEnd(result);
     }
   }
 
   /**
-   * Exibe números flutuantes animados de dano, armadura ou cura
+   * Exibe números flutuantes animados de dano, armadura ou cura com física balística
    */
   showFloatingNumber(targetEl, text, type = 'damage') {
-    if (!targetEl) return;
+    if (!targetEl || !this.combatStageEl) return;
+
+    const parsedNum = parseInt(String(text).replace(/[^0-9]/g, ''), 10);
+    const isCrit = type === 'crit' || (type === 'damage' && !isNaN(parsedNum) && parsedNum >= 14);
+    const effectiveType = isCrit ? 'crit' : type;
+    const arcSide = Math.random() > 0.5 ? 'float-arc-right' : 'float-arc-left';
 
     const numEl = document.createElement('div');
-    numEl.className = `floating-number floating-${type}`;
+    numEl.className = `floating-number floating-${effectiveType} ${arcSide}`;
     numEl.textContent = text;
 
     const rect = targetEl.getBoundingClientRect();
     const stageRect = this.combatStageEl.getBoundingClientRect();
 
-    const posX = rect.left - stageRect.left + rect.width / 2 - 25;
+    const randomOffsetX = (Math.random() * 26 - 13);
+    const posX = rect.left - stageRect.left + rect.width / 2 - 25 + randomOffsetX;
     const posY = rect.top - stageRect.top + rect.height / 3;
 
     numEl.style.left = `${posX}px`;
@@ -691,21 +715,22 @@ export class CombatRenderer {
 
     setTimeout(() => {
       numEl.remove();
-    }, 900);
+    }, 950);
   }
 
   /**
-   * Efeito de tremor de tela (Screenshake)
+   * Efeito de tremor de tela (Screenshake com intensidade normal ou pesada)
    */
-  triggerScreenShake() {
+  triggerScreenShake(intensity = 'normal') {
     const appEl = document.getElementById('app') || document.body;
-    appEl.classList.remove('shake-screen');
+    appEl.classList.remove('shake-screen', 'shake-screen-heavy');
     void appEl.offsetWidth;
-    appEl.classList.add('shake-screen');
+    const shakeClass = intensity === 'heavy' ? 'shake-screen-heavy' : 'shake-screen';
+    appEl.classList.add(shakeClass);
 
     setTimeout(() => {
-      appEl.classList.remove('shake-screen');
-    }, 380);
+      appEl.classList.remove('shake-screen', 'shake-screen-heavy');
+    }, intensity === 'heavy' ? 440 : 350);
   }
 
   /**

@@ -19,6 +19,7 @@ export class CombatFx {
     this.particles = [];
     this.slashes = [];
     this.shockwaves = [];
+    this.embers = [];
     this.isRunning = false;
     this.rafId = null;
 
@@ -296,6 +297,36 @@ export class CombatFx {
     this._startLoop();
   }
 
+  /**
+   * 6. BRASAS AMBIENTAIS INCANDESCENTES (Ambient Torch Embers)
+   */
+  startAmbientEmbers(count = 22) {
+    if (this.embers && this.embers.length > 0) return;
+    this.embers = [];
+    const colors = ['#f59e0b', '#d97706', '#ef4444', '#fbbf24', '#ff7849'];
+    const w = this.width || 600;
+    const h = this.height || 400;
+
+    for (let i = 0; i < count; i++) {
+      this.embers.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: -0.35 - Math.random() * 0.55,
+        size: 1.2 + Math.random() * 1.8,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        alpha: 0.15 + Math.random() * 0.55,
+        pulsePhase: Math.random() * Math.PI * 2,
+        pulseSpeed: 0.02 + Math.random() * 0.03
+      });
+    }
+    this._startLoop();
+  }
+
+  stopAmbientEmbers() {
+    this.embers = [];
+  }
+
   _startLoop() {
     if (this.isRunning) return;
     this.isRunning = true;
@@ -311,8 +342,9 @@ export class CombatFx {
     const hasSlashes = this.slashes.length > 0;
     const hasShockwaves = this.shockwaves.length > 0;
     const hasParticles = this.particles.length > 0;
+    const hasEmbers = this.embers && this.embers.length > 0;
 
-    if (!hasSlashes && !hasShockwaves && !hasParticles) {
+    if (!hasSlashes && !hasShockwaves && !hasParticles && !hasEmbers) {
       this.isRunning = false;
       if (this.ctx) {
         this.ctx.clearRect(0, 0, this.width, this.height);
@@ -324,6 +356,22 @@ export class CombatFx {
   }
 
   _update() {
+    // 0. Atualiza brasas ambientais contínuas de tocha
+    if (this.embers && this.embers.length > 0) {
+      const w = this.width || 600;
+      const h = this.height || 400;
+      for (let i = 0; i < this.embers.length; i++) {
+        const e = this.embers[i];
+        e.x += e.vx;
+        e.y += e.vy;
+        e.pulsePhase += e.pulseSpeed;
+        if (e.y < -10) {
+          e.y = h + 10;
+          e.x = Math.random() * w;
+        }
+      }
+    }
+
     // Limita máximo de partículas e efeitos simultâneos para evitar engasgos no mobile
     if (this.particles.length > 50) {
       this.particles.splice(0, this.particles.length - 50);
@@ -387,6 +435,20 @@ export class CombatFx {
   _render() {
     if (!this.ctx) return;
     this.ctx.clearRect(0, 0, this.width, this.height);
+
+    // 0. Renderiza Brasas Ambientais de Tocha (Ambient Torch Embers)
+    if (this.embers && this.embers.length > 0) {
+      this.ctx.save();
+      for (const e of this.embers) {
+        const dynamicAlpha = Math.max(0.08, e.alpha * (0.7 + Math.sin(e.pulsePhase) * 0.3));
+        this.ctx.globalAlpha = dynamicAlpha;
+        this.ctx.fillStyle = e.color;
+        this.ctx.beginPath();
+        this.ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+      this.ctx.restore();
+    }
 
     // 1. Renderiza ondas de choque (Shield Wave - Zero Blur Dual Stroke)
     this.ctx.save();
@@ -504,6 +566,7 @@ export class CombatFx {
   }
 
   destroy() {
+    this.stopAmbientEmbers();
     window.removeEventListener('resize', this._resizeHandler);
     if (this.rafId) {
       cancelAnimationFrame(this.rafId);

@@ -25,6 +25,27 @@
   contain: layout paint;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  transform-style: preserve-3d;
+  perspective: 800px;
+}
+
+/* Camada de Brilho Especular 3D (Tilt Glare) */
+.card-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at var(--glare-x, 50%) var(--glare-y, 50%), rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.05) 35%, transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+  z-index: 15;
+  mix-blend-mode: overlay;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .game-card:hover .card-glare {
+    opacity: 1;
+  }
 }
 
 /* Moldura Interna de Filigrana Metálica */
@@ -33,51 +54,89 @@
   position: absolute;
   inset: 3px;
   border-radius: 7px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   pointer-events: none;
+  transition: border-color 0.2s ease;
 }
 
-/* 1. Ataque (Carmesim Belicoso) */
-.game-card.card-attack {
-  border-color: #a82e3b;
+/* Cantoneiras Rúnicas Decorativas nos 4 Cantos */
+.game-card::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: 9px;
   background: 
-    radial-gradient(circle at 50% 25%, rgba(231, 76, 60, 0.25) 0%, transparent 70%),
-    linear-gradient(165deg, #2c1619 0%, #190e10 70%, #0c0708 100%);
+    linear-gradient(to right, rgba(212, 175, 55, 0.45) 2px, transparent 2px) 0 0,
+    linear-gradient(to bottom, rgba(212, 175, 55, 0.45) 2px, transparent 2px) 0 0,
+    linear-gradient(to left, rgba(212, 175, 55, 0.45) 2px, transparent 2px) 100% 0,
+    linear-gradient(to bottom, rgba(212, 175, 55, 0.45) 2px, transparent 2px) 100% 0,
+    linear-gradient(to right, rgba(212, 175, 55, 0.45) 2px, transparent 2px) 0 100%,
+    linear-gradient(to top, rgba(212, 175, 55, 0.45) 2px, transparent 2px) 0 100%,
+    linear-gradient(to left, rgba(212, 175, 55, 0.45) 2px, transparent 2px) 100% 100%,
+    linear-gradient(to top, rgba(212, 175, 55, 0.45) 2px, transparent 2px) 100% 100%;
+  background-repeat: no-repeat;
+  background-size: 8px 8px;
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+/* 1. Ataque (Ferro Forjado Carmesim & Rubi Lapidado) */
+.game-card.card-attack {
+  border-color: #8c242c;
+  background: 
+    radial-gradient(circle at 50% 20%, rgba(231, 76, 60, 0.22) 0%, transparent 68%),
+    linear-gradient(165deg, #2a1215 0%, #1a0b0d 60%, #0d0607 100%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(140, 36, 44, 0.35);
+}
+.game-card.card-attack::after {
+  border-color: rgba(231, 76, 60, 0.35);
+  box-shadow: inset 0 0 8px rgba(180, 40, 50, 0.25);
 }
 @media (hover: hover) and (pointer: fine) {
   .game-card.card-attack:hover {
-    border-color: var(--crimson-light);
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.85), 0 0 18px var(--crimson-glow);
+    border-color: #ff5e62;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.9), 0 0 24px rgba(231, 76, 60, 0.6), inset 0 0 14px rgba(255, 94, 98, 0.3);
   }
 }
 
-/* 2. Defesa (Safira Protetora) */
+/* 2. Defesa (Aço Temperado Safira & Glifo de Proteção) */
 .game-card.card-defense {
-  border-color: #256bb8;
+  border-color: #2364a8;
   background: 
-    radial-gradient(circle at 50% 25%, rgba(58, 145, 252, 0.25) 0%, transparent 70%),
-    linear-gradient(165deg, #162438 0%, #0e1724 70%, #080d14 100%);
+    radial-gradient(circle at 50% 20%, rgba(58, 145, 252, 0.22) 0%, transparent 68%),
+    linear-gradient(165deg, #122135 0%, #0a1420 60%, #050a10 100%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(35, 100, 168, 0.35);
+}
+.game-card.card-defense::after {
+  border-color: rgba(58, 145, 252, 0.38);
+  box-shadow: inset 0 0 8px rgba(35, 100, 168, 0.25);
 }
 @media (hover: hover) and (pointer: fine) {
   .game-card.card-defense:hover {
-    border-color: var(--sapphire-light);
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.85), 0 0 18px var(--sapphire-glow);
+    border-color: #60a5fa;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.9), 0 0 24px rgba(58, 145, 252, 0.6), inset 0 0 14px rgba(96, 165, 250, 0.3);
   }
 }
 
-/* 3. Especial / Habilidade (Ouro e Esmeralda Arcano) */
+/* 3. Especial / Habilidade (Filigrana Dourada & Éter Arcano) */
 .game-card.card-skill,
 .game-card.card-special {
-  border-color: #b08d2b;
+  border-color: #b58928;
   background: 
-    radial-gradient(circle at 50% 25%, rgba(212, 175, 55, 0.25) 0%, transparent 70%),
-    linear-gradient(165deg, #2e2617 0%, #1c170d 70%, #0e0b06 100%);
+    radial-gradient(circle at 50% 20%, rgba(212, 175, 55, 0.24) 0%, transparent 68%),
+    linear-gradient(165deg, #2a2211 0%, #161208 60%, #0a0804 100%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(181, 137, 40, 0.35);
+}
+.game-card.card-skill::after,
+.game-card.card-special::after {
+  border-color: rgba(250, 228, 140, 0.42);
+  box-shadow: inset 0 0 8px rgba(212, 175, 55, 0.25);
 }
 @media (hover: hover) and (pointer: fine) {
   .game-card.card-skill:hover,
   .game-card.card-special:hover {
-    border-color: var(--gold-light);
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.85), 0 0 20px var(--gold-glow);
+    border-color: #ffd700;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.9), 0 0 26px rgba(255, 215, 0, 0.65), inset 0 0 14px rgba(255, 215, 0, 0.35);
   }
 }
 
@@ -174,26 +233,77 @@
 }
 
 
-/* Gema de Custo de Energia (Superior Esquerda) */
+/* Gema de Custo de Energia (Superior Esquerda - Safira Lapidada 3D) */
 .card-cost {
   position: absolute;
-  top: -6px;
-  left: -6px;
-  width: clamp(26px, 2.8vw, 32px);
-  height: clamp(26px, 2.8vw, 32px);
+  top: -7px;
+  left: -7px;
+  width: clamp(28px, 3vw, 34px);
+  height: clamp(28px, 3vw, 34px);
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #74b9ff 0%, #0984e3 65%, #08295e 100%);
-  border: 2px solid #dff9fb;
+  background: 
+    radial-gradient(circle at 35% 28%, #dcf8c6 0%, #38bdf8 25%, #0284c7 60%, #033a75 100%);
+  border: 2px solid #e0f2fe;
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-fantasy);
   font-weight: 900;
-  font-size: clamp(0.9rem, 1.1vw, 1.15rem);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8), 0 0 14px var(--sapphire-glow);
-  z-index: 10;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  font-size: clamp(0.92rem, 1.15vw, 1.18rem);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.9), 
+    inset 0 2px 4px rgba(255, 255, 255, 0.75), 
+    inset 0 -2px 4px rgba(0, 0, 0, 0.65),
+    0 0 16px rgba(56, 189, 248, 0.8);
+  z-index: 18;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.7);
+  letter-spacing: -0.5px;
+}
+
+/* Verso da Carta Colecionável (Card Back - Dragão de Pedra & Ouro) */
+.card-back {
+  width: var(--card-w);
+  height: var(--card-h);
+  border-radius: 10px;
+  background: 
+    radial-gradient(circle at center, #2e1e12 0%, #150f0b 70%, #0a0705 100%);
+  border: 2.5px solid #c99e32;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.9), inset 0 0 14px rgba(201, 158, 50, 0.3);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.card-back::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 223, 100, 0.35);
+  pointer-events: none;
+}
+
+.card-back-emblem {
+  width: 58%;
+  height: 58%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.25) 0%, transparent 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1.5px solid rgba(212, 175, 55, 0.5);
+  box-shadow: 0 0 18px rgba(212, 175, 55, 0.4);
+}
+
+.card-back-emblem svg {
+  width: 70%;
+  height: 70%;
+  fill: #ffd700;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
 }
 
 /* Cabeçalho da Carta (Título) */

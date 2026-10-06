@@ -142,9 +142,43 @@
   transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+.combatant-avatar-frame {
+  width: clamp(100px, 15vw, 160px);
+  height: clamp(100px, 15vw, 160px);
+  border-radius: 50%;
+  background: radial-gradient(circle, #1a1e2b 0%, #0d0f17 100%);
+  border: 3px solid #3d2b1f;
+  outline: 2px solid #d4af37;
+  outline-offset: -5px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: clamp(6px, 1.2vh, 12px);
+  overflow: visible;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.95), 0 0 25px rgba(212, 175, 55, 0.35);
+}
+
 .hero-combatant .combatant-avatar-frame {
-  border-color: #3a91fc;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px var(--sapphire-glow);
+  border-color: #1e3a5f;
+  outline-color: #60a5fa;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.95), 0 0 25px rgba(59, 130, 246, 0.45);
+}
+
+.hero-combatant .combatant-avatar-frame::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 16px;
+  background: radial-gradient(circle at 35% 35%, #93c5fd 0%, #3b82f6 60%, #1e3a8a 100%);
+  border: 1.5px solid #dbeafe;
+  border-radius: 50%;
+  box-shadow: 0 0 12px #60a5fa;
+  z-index: 10;
 }
 
 .combatant-avatar-frame svg {
@@ -176,8 +210,24 @@
 }
 
 .enemy-combatant .combatant-avatar-frame {
-  border-color: #e74c3c;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px var(--crimson-glow);
+  border-color: #4a151b;
+  outline-color: #f87171;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.95), 0 0 25px rgba(239, 68, 68, 0.45);
+}
+
+.enemy-combatant .combatant-avatar-frame::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 16px;
+  background: radial-gradient(circle at 35% 35%, #fca5a5 0%, #ef4444 60%, #7f1d1d 100%);
+  border: 1.5px solid #fee2e2;
+  border-radius: 50%;
+  box-shadow: 0 0 12px #ef4444;
+  z-index: 10;
 }
 
 /* Destaque para o Chefe Dragão */
@@ -185,10 +235,11 @@
   width: clamp(130px, 21vw, 220px);
   height: clamp(130px, 21vw, 220px);
   border-color: var(--gold-primary);
+  outline-color: #fbbf24;
   box-shadow: 
-    0 16px 40px rgba(0, 0, 0, 0.9), 
-    0 0 35px rgba(231, 76, 60, 0.6),
-    0 0 15px var(--gold-glow);
+    0 16px 40px rgba(0, 0, 0, 0.95), 
+    0 0 35px rgba(239, 68, 68, 0.7),
+    0 0 25px var(--gold-glow);
   animation: dragonPulse 3.5s infinite ease-in-out;
 }
 
@@ -250,22 +301,22 @@
   }
 }
 
-/* Placa Gótica Rúnica de Intenção de Guerra do Inimigo */
+/* Placa Gótica Rúnica de Intenção de Guerra do Inimigo (Brasão de Escudo) */
 .enemy-intent-bubble {
   position: absolute;
-  top: clamp(-42px, -5vh, -28px);
+  top: clamp(-46px, -5.5vh, -32px);
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(135deg, rgba(32, 35, 50, 0.98) 0%, rgba(18, 20, 30, 0.98) 50%, rgba(10, 11, 16, 0.98) 100%);
+  background: radial-gradient(circle at 50% 20%, #2a161c 0%, #150d12 70%, #0a0609 100%);
   border: 2px solid var(--border-gold, #c99e32);
-  outline: 1.5px solid rgba(179, 27, 44, 0.6);
+  outline: 1.5px solid rgba(220, 38, 38, 0.65);
   outline-offset: -3.5px;
-  border-radius: 6px;
+  border-radius: 6px 6px 16px 16px;
   padding: clamp(4px, 0.6vh, 7px) clamp(10px, 1.3vw, 16px);
   display: flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.9), 0 0 14px var(--crimson-glow);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.95), 0 0 16px rgba(239, 68, 68, 0.6);
   z-index: 25;
   animation: threatWarningPulse 2.4s ease-in-out infinite;
   white-space: nowrap;
@@ -274,11 +325,11 @@
 @keyframes threatWarningPulse {
   0%, 100% {
     transform: translateX(-50%) translateY(0) scale(1);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.9), 0 0 12px var(--crimson-glow);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.95), 0 0 14px rgba(239, 68, 68, 0.5);
   }
   50% {
     transform: translateX(-50%) translateY(-4px) scale(1.05);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.95), 0 0 22px rgba(231, 76, 60, 0.85);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.98), 0 0 24px rgba(239, 68, 68, 0.85);
   }
 }
 
@@ -339,38 +390,7 @@
   font-size: 1.25rem;
 }
 
-/* Badge de Afixo Especial do Inimigo / Elite (Fase 3) */
-.enemy-affix-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  background: linear-gradient(135deg, rgba(234, 88, 12, 0.3) 0%, rgba(180, 83, 9, 0.45) 100%);
-  border: 1.5px solid #f59e0b;
-  color: #fef3c7;
-  font-family: var(--font-fantasy);
-  font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  padding: 3px 10px;
-  border-radius: var(--radius-round);
-  margin: 0 auto;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 10px rgba(245, 158, 11, 0.4);
-  animation: affixGlow 2.5s infinite ease-in-out;
-  cursor: help;
-}
-
-@keyframes affixGlow {
-  0%, 100% {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 8px rgba(245, 158, 11, 0.3);
-  }
-  50% {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8), 0 0 16px rgba(245, 158, 11, 0.7);
-  }
-}
-
-/* Barra de Vida & Armadura */
+/* Barra de Vida & Armadura com Damage Bleed */
 .hp-bar-wrapper {
   position: relative;
   width: 100%;
@@ -379,19 +399,34 @@
 .hp-bar {
   width: 100%;
   height: 18px;
-  background: rgba(15, 17, 24, 0.85);
-  border-radius: var(--radius-round);
-  border: 1.5px solid var(--border-frame);
+  background: #0c0e14;
+  border-radius: 4px;
+  border: 1.5px solid #4a3828;
   overflow: hidden;
   position: relative;
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.9);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9), 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.hp-bar-bleed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #b91c1c 0%, #ea580c 50%, #f59e0b 100%);
+  transition: width 0.65s cubic-bezier(0.2, 0.8, 0.2, 1);
+  z-index: 1;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.7);
 }
 
 .hp-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #991420 0%, #e74c3c 100%);
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 10px rgba(231, 76, 60, 0.6);
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #7f1d1d 0%, #b91c1c 50%, #ef4444 100%);
+  transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.7);
 }
 
 .hp-text {
@@ -406,6 +441,7 @@
   color: #ffffff;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
   pointer-events: none;
+  z-index: 5;
 }
 
 /* Escudo / Armadura Badge */
@@ -427,7 +463,7 @@
   font-size: 0.85rem;
   font-weight: 900;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), 0 0 10px var(--sapphire-glow);
-  z-index: 3;
+  z-index: 6;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s, transform 0.2s;
@@ -439,7 +475,7 @@
   transform: translateY(-50%) scale(1);
 }
 
-/* Orbes de Mana / Energia do Jogador */
+/* Orbes Mágicos de Energia com Líquido Pulsante Arcana */
 .energy-container {
   display: flex;
   flex-direction: row;
@@ -452,26 +488,59 @@
 .energy-orbs-group {
   display: flex;
   flex-direction: row;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
 }
 
 .energy-orb {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #74b9ff 0%, #0984e3 60%, #0c2461 100%);
-  border: 1.5px solid #aed6f1;
-  box-shadow: 0 0 12px var(--sapphire-glow), 0 2px 5px rgba(0, 0, 0, 0.7);
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at 35% 35%, #00d2d3 0%, #0984e3 50%, #0c2461 100%);
+  border: 2px solid #74b9ff;
+  box-shadow: 0 0 16px rgba(9, 132, 227, 0.85), inset 0 0 8px rgba(255, 255, 255, 0.5);
   transition: transform 0.25s, opacity 0.25s, filter 0.25s;
 }
 
+.energy-orb .orb-liquid {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 60%, rgba(9, 132, 227, 0.95) 0%, rgba(0, 210, 211, 0.65) 100%);
+  animation: manaPulse 2.4s infinite ease-in-out;
+}
+
+.energy-orb .orb-glint {
+  position: absolute;
+  top: 3px;
+  left: 5px;
+  width: 6px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  transform: rotate(-30deg);
+}
+
+@keyframes manaPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+    filter: brightness(1.2);
+  }
+}
+
 .energy-orb.spent {
-  background: #242938;
-  border-color: #3e4459;
-  box-shadow: none;
-  opacity: 0.35;
-  transform: scale(0.85);
+  background: #14161f;
+  border-color: #2c3144;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
+  opacity: 0.45;
+  filter: grayscale(0.8);
+  transform: scale(0.88);
 }
 
 .energy-text {
@@ -480,6 +549,7 @@
   font-size: 0.95rem;
   color: #74b9ff;
   letter-spacing: 0.5px;
+  text-shadow: 0 0 8px rgba(116, 185, 255, 0.6);
 }
 
 /* ==========================================================================
@@ -646,34 +716,33 @@
 }
 
 .pile-visual {
-  width: 52px;
-  height: 74px;
+  width: 54px;
+  height: 76px;
   border-radius: 6px;
-  background: linear-gradient(145deg, #1f2334 0%, #10121b 100%);
-  border: 1.5px solid var(--border-frame);
+  background: linear-gradient(145deg, #42281d 0%, #291811 50%, #150c08 100%);
+  border: 1.5px solid #c99e32;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.85), inset 0 0 10px rgba(0, 0, 0, 0.8);
 }
 
 .pile-visual::before {
   content: '';
   position: absolute;
-  top: -3px;
-  left: 2px;
-  right: -2px;
+  top: 3px;
+  left: 3px;
+  right: 3px;
   bottom: 3px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: #191c2b;
-  z-index: -1;
+  border-radius: 4px;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  pointer-events: none;
 }
 
 .card-pile:hover .pile-visual {
-  border-color: var(--gold-primary);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.8), 0 0 12px var(--gold-glow);
+  border-color: #fce881;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.9), 0 0 16px var(--gold-glow);
 }
 
 .pile-count-badge {
@@ -768,16 +837,19 @@
 }
 
 .btn-end-turn {
-  padding: 12px 22px;
-  font-size: 1rem;
-  border-radius: var(--radius-sm);
-  background: linear-gradient(180deg, #fae48c 0%, #d4af37 50%, #99781d 100%);
+  padding: 12px 24px;
+  font-size: 1.05rem;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #fae48c 0%, #d4af37 40%, #b89124 75%, #785a07 100%);
   color: #0b0c10;
-  border: 1.5px solid #fae48c;
-  box-shadow: 0 4px 18px rgba(212, 175, 55, 0.45);
+  border: 2px solid #fae48c;
+  outline: 1.5px solid rgba(255, 255, 255, 0.4);
+  outline-offset: -3.5px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.9), 0 0 24px rgba(212, 175, 55, 0.65), inset 0 1px 2px rgba(255, 255, 255, 0.8);
   font-family: var(--font-fantasy);
-  font-weight: 800;
-  letter-spacing: 1px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -789,16 +861,17 @@
 .btn-subtext {
   font-family: var(--font-ui);
   font-size: 0.68rem;
-  font-weight: 600;
-  color: rgba(11, 12, 16, 0.7);
+  font-weight: 700;
+  color: rgba(11, 12, 16, 0.75);
   letter-spacing: 0.5px;
   margin-top: 2px;
 }
 
 .btn-end-turn:hover:not(:disabled) {
-  transform: translateY(-3px);
-  background: linear-gradient(180deg, #fce881 0%, #b89124 100%);
-  box-shadow: 0 6px 24px var(--gold-glow);
+  transform: translateY(-3px) scale(1.02);
+  background: linear-gradient(180deg, #fff2a3 0%, #fae48c 35%, #d4af37 70%, #99781d 100%);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.95), 0 0 35px var(--gold-glow);
+  filter: brightness(1.12);
 }
 
 .btn-end-turn:disabled {
@@ -810,9 +883,9 @@
   transform: none;
 }
 
-/* Efeitos Visuais de Impacto (Floating Numbers & Tela) */
+/* Efeitos Visuais de Impacto (Floating Combat Numbers & Física Balística) */
 
-/* Números Flutuantes de Dano / Bloqueio */
+/* Números Flutuantes de Dano / Bloqueio / Cura */
 .floating-number {
   position: absolute;
   font-family: var(--font-fantasy);
@@ -821,43 +894,96 @@
   pointer-events: none;
   z-index: 500;
   animation: floatNumberAnim 0.9s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+  will-change: transform, opacity;
+}
+
+.floating-number.float-arc-left {
+  animation: floatParabolicLeft 0.95s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+.floating-number.float-arc-right {
+  animation: floatParabolicRight 0.95s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
 }
 
 .floating-damage {
-  color: #ff3838;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9), 0 0 16px rgba(255, 56, 56, 0.6);
+  color: #ff3344;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95), 0 0 18px rgba(255, 51, 68, 0.7);
+}
+
+.floating-crit {
+  font-size: 2.8rem;
+  color: #fde047;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.95), 0 0 25px rgba(255, 215, 0, 0.9), 0 0 35px rgba(220, 38, 38, 0.85);
+  z-index: 550;
+  letter-spacing: 1px;
 }
 
 .floating-block {
-  color: #38ada9;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9), 0 0 16px rgba(56, 173, 169, 0.6);
+  color: #38bdf8;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9), 0 0 18px rgba(56, 189, 248, 0.75);
 }
 
 .floating-heal {
-  color: #2ed573;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9), 0 0 16px rgba(46, 213, 115, 0.6);
+  color: #4ade80;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9), 0 0 18px rgba(74, 222, 128, 0.8);
+}
+
+.floating-poison {
+  color: #34d399;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9), 0 0 18px rgba(16, 185, 129, 0.8);
+}
+
+.floating-burn {
+  color: #fb923c;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9), 0 0 18px rgba(249, 115, 22, 0.8);
 }
 
 @keyframes floatNumberAnim {
+  0% { opacity: 0; transform: translateY(10px) scale(0.6); }
+  20% { opacity: 1; transform: translateY(-20px) scale(1.3); }
+  70% { opacity: 1; transform: translateY(-50px) scale(1.1); }
+  100% { opacity: 0; transform: translateY(-75px) scale(0.9); }
+}
+
+@keyframes floatParabolicLeft {
   0% {
     opacity: 0;
-    transform: translateY(10px) scale(0.6);
+    transform: translate(0, 10px) scale(0.65) rotate(0deg);
   }
-  20% {
+  22% {
     opacity: 1;
-    transform: translateY(-20px) scale(1.3);
+    transform: translate(-14px, -26px) scale(1.35) rotate(-6deg);
   }
-  70% {
+  68% {
     opacity: 1;
-    transform: translateY(-50px) scale(1.1);
+    transform: translate(-32px, -52px) scale(1.12) rotate(-10deg);
   }
   100% {
     opacity: 0;
-    transform: translateY(-75px) scale(0.9);
+    transform: translate(-46px, -78px) scale(0.85) rotate(-14deg);
   }
 }
 
-/* Tremor de Tela ao Sofrer Dano */
+@keyframes floatParabolicRight {
+  0% {
+    opacity: 0;
+    transform: translate(0, 10px) scale(0.65) rotate(0deg);
+  }
+  22% {
+    opacity: 1;
+    transform: translate(14px, -26px) scale(1.35) rotate(6deg);
+  }
+  68% {
+    opacity: 1;
+    transform: translate(32px, -52px) scale(1.12) rotate(10deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(46px, -78px) scale(0.85) rotate(14deg);
+  }
+}
+
+/* Tremor de Tela Normal */
 .shake-screen {
   animation: screenShakeAnim 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
@@ -867,6 +993,18 @@
   20%, 80% { transform: translate3d(5px, 0, 0); }
   30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
   40%, 60% { transform: translate3d(6px, 0, 0); }
+}
+
+/* Tremor de Tela Pesado (Impactos Críticos & Golpes de Chefe) */
+.shake-screen-heavy {
+  animation: screenShakeHeavyAnim 0.44s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes screenShakeHeavyAnim {
+  10%, 90% { transform: translate3d(-6px, -2px, 0) rotate(-1deg); }
+  20%, 80% { transform: translate3d(8px, 3px, 0) rotate(1.2deg); }
+  30%, 50%, 70% { transform: translate3d(-10px, -4px, 0) rotate(-1.5deg); }
+  40%, 60% { transform: translate3d(9px, 4px, 0) rotate(1.4deg); }
 }
 
 /* Flash de Impacto */

@@ -266,6 +266,7 @@ export class CardRenderer {
     const upgradeBadgeHtml = isUpgraded ? '<span class="upgraded-badge">+</span>' : '';
 
     cardEl.innerHTML = `
+      <div class="card-glare"></div>
       <div class="card-cost" title="Custo de Energia">${card.cost}</div>
       <div class="card-header">
         <span class="card-title">${cleanTitle}${upgradeBadgeHtml}</span>
@@ -278,6 +279,9 @@ export class CardRenderer {
         <p class="card-description">${formattedDesc}</p>
       </div>
     `;
+
+    // Ativa inclinação tátil 3D e reflexo dinâmico de luz
+    CardRenderer.setupCardTilt(cardEl);
 
     // Interações de Mouse e Toque
     if (onHover) {
@@ -295,6 +299,84 @@ export class CardRenderer {
     }
 
     return cardEl;
+  }
+
+  /**
+   * Configura inclinação 3D tátil (3D Tilt) e reflexo dinâmico de luz
+   */
+  static setupCardTilt(cardEl) {
+    if (!cardEl || typeof cardEl.addEventListener !== 'function') return;
+
+    let isHovered = false;
+    let rafId = null;
+
+    const handleMove = (clientX, clientY) => {
+      if (!isHovered || (cardEl.classList && cardEl.classList.contains('disabled'))) return;
+      if (typeof cardEl.getBoundingClientRect !== 'function') return;
+      const rect = cardEl.getBoundingClientRect();
+      if (!rect || rect.width === 0 || rect.height === 0) return;
+
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const rotateX = Math.max(-9, Math.min(9, ((y - centerY) / centerY) * -9));
+      const rotateY = Math.max(-9, Math.min(9, ((x - centerX) / centerX) * 9));
+      const glareX = Math.max(0, Math.min(100, (x / rect.width) * 100));
+      const glareY = Math.max(0, Math.min(100, (y / rect.height) * 100));
+
+      if (cardEl.style) {
+        cardEl.style.setProperty('--glare-x', `${glareX.toFixed(1)}%`);
+        cardEl.style.setProperty('--glare-y', `${glareY.toFixed(1)}%`);
+        cardEl.style.transform = `perspective(800px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-10px) scale(1.05)`;
+      }
+    };
+
+    cardEl.addEventListener('mouseenter', () => {
+      isHovered = true;
+    });
+
+    cardEl.addEventListener('mousemove', (e) => {
+      if (typeof requestAnimationFrame === 'function') {
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => handleMove(e.clientX, e.clientY));
+      } else {
+        handleMove(e.clientX, e.clientY);
+      }
+    });
+
+    cardEl.addEventListener('mouseleave', () => {
+      isHovered = false;
+      if (rafId && typeof cancelAnimationFrame === 'function') cancelAnimationFrame(rafId);
+      if (cardEl.style) {
+        cardEl.style.transform = '';
+        cardEl.style.removeProperty('--glare-x');
+        cardEl.style.removeProperty('--glare-y');
+      }
+    });
+  }
+
+  /**
+   * Renderiza o verso colecionável da carta (pedra rúnica e dragão em relevo)
+   */
+  static renderCardBack(customClass = '') {
+    let backEl;
+    if (typeof document !== 'undefined') {
+      backEl = document.createElement('div');
+    } else {
+      backEl = { className: '', setAttribute: () => {}, innerHTML: '' };
+    }
+    backEl.className = `game-card card-back ${customClass}`.trim();
+    const assets = (typeof window !== 'undefined' && window.GameAssets) || {};
+    const dragonSvg = (assets.SVGS && assets.SVGS.dragon) || '<svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>';
+    backEl.innerHTML = `
+      <div class="card-glare"></div>
+      <div class="card-back-emblem">
+        ${dragonSvg}
+      </div>
+    `;
+    return backEl;
   }
 
   /**

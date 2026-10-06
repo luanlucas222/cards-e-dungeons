@@ -228,6 +228,7 @@
               <div class="hp-bar-wrapper">
                 <div id="hero-armor-badge" class="armor-badge" title="Armadura / Bloqueio Ativo">0</div>
                 <div class="hp-bar">
+                  <div id="hero-hp-bar-bleed" class="hp-bar-bleed" style="width: 100%;"></div>
                   <div id="hero-hp-bar-fill" class="hp-bar-fill" style="width: 100%;"></div>
                   <div id="hero-hp-text" class="hp-text">70 / 70</div>
                 </div>
@@ -254,6 +255,7 @@
               <div class="hp-bar-wrapper">
                 <div id="enemy-armor-badge" class="armor-badge" title="Armadura do Inimigo">0</div>
                 <div class="hp-bar">
+                  <div id="enemy-hp-bar-bleed" class="hp-bar-bleed" style="width: 100%;"></div>
                   <div id="enemy-hp-bar-fill" class="hp-bar-fill" style="width: 100%;"></div>
                   <div id="enemy-hp-text" class="hp-text">25 / 25</div>
                 </div>
@@ -309,6 +311,21 @@
       <!-- 4. TELA: VITÓRIA GLORIOSA -->
       <section id="screen-victory" class="screen-view menu-screen">
         <div class="game-over-modal is-victory">
+          <!-- Baú 3D de Vitória com Feixes de Luz Volumétricos -->
+          <div class="victory-chest-stage">
+            <div class="victory-light-rays"></div>
+            <div class="victory-chest-box">
+              <div class="victory-chest-glow"></div>
+              <img src="assets/ui/chest_reward.png" class="victory-chest-img" alt="Baú de Vitória" onerror="this.style.display='none'" />
+              <div class="victory-chest-loot-burst">
+                <span class="burst-coin" style="--tx: -35px; --ty: -30px;">🪙</span>
+                <span class="burst-soul" style="--tx: 30px; --ty: -35px;">🔮</span>
+                <span class="burst-coin" style="--tx: -20px; --ty: -45px;">🪙</span>
+                <span class="burst-gem" style="--tx: 25px; --ty: -20px;">💎</span>
+              </div>
+            </div>
+          </div>
+
           <div id="victory-icon-box" class="game-over-icon"></div>
           <h1 class="game-over-title">VITÓRIA GLORIOSA!</h1>
           <p class="game-over-subtitle">
